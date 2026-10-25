@@ -1,1 +1,816 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>CK Dentmaster – Jobs</title>
+<meta name="theme-color" content="#0a0a0a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CK Dentmaster">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a0a; --bg2:#141414; --card:#1b1b1b; --card2:#242424; --line:#2c2c2c;
+  --text:#f2f2f2; --muted:#9a9a9a; --lime:#b6f21a; --lime-dk:#8fc600; --red:#ff5a5a; --amber:#ffb340; --blue:#5aa7ff;
+  --radius:14px; --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Barlow',system-ui,-apple-system,sans-serif;font-size:16px;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
+body{min-height:100dvh}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+h1,h2,h3{margin:0;font-weight:700}
+a{color:var(--lime)}
+.hidden{display:none!important}
 
+/* ── Screens ── */
+#authScreen{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:18px}
+#authScreen img{width:min(320px,80vw)}
+.authBox{width:100%;max-width:360px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;gap:12px}
+.authBox h2{font-size:18px;text-transform:uppercase;letter-spacing:.06em}
+
+#app{display:flex;flex-direction:column;min-height:100dvh}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(10,10,10,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:calc(10px + var(--safe-t)) 16px 10px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.topbar img{height:34px}
+.topbar .title{font-weight:700;font-size:17px;text-transform:uppercase;letter-spacing:.05em}
+.content{flex:1;padding:14px 14px calc(92px + var(--safe-b))}
+.bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(14,14,14,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:6px 0 calc(6px + var(--safe-b))}
+.bottomnav button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.bottomnav button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.bottomnav button.active{color:var(--lime)}
+
+/* ── Components ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:12px;font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.04em;background:var(--card2);color:var(--text);border:1px solid var(--line);width:100%;transition:transform .08s}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--lime);color:#0a0a0a;border-color:var(--lime)}
+.btn.danger{background:transparent;color:var(--red);border-color:#4a2626}
+.btn.ghost{background:transparent}
+.btn.sm{padding:9px 12px;font-size:13px;width:auto}
+.btn:disabled{opacity:.5}
+.btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.fab{position:fixed;right:18px;bottom:calc(86px + var(--safe-b));z-index:21;width:58px;height:58px;border-radius:50%;background:var(--lime);color:#0a0a0a;box-shadow:0 8px 24px rgba(182,242,26,.35);display:flex;align-items:center;justify-content:center}
+.fab svg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round}
+
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.field label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.input{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:11px;padding:13px 14px;font-size:16px;outline:none;color:var(--text);appearance:none;-webkit-appearance:none}
+.input:focus{border-color:var(--lime)}
+textarea.input{min-height:110px;resize:vertical}
+select.input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%239a9a9a' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:38px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.reg{font-family:'Barlow',monospace;text-transform:uppercase;letter-spacing:.12em;font-weight:700;background:#f7e04d;color:#111;border-color:#c9b600}
+.reg::placeholder{color:#777;letter-spacing:.02em;font-weight:500}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:10px}
+.card.tap{cursor:pointer}
+.card.tap:active{background:var(--card2)}
+.section{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin:16px 0 8px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.spread{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;padding:8px 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-weight:600;font-size:13px;color:var(--muted);white-space:nowrap}
+.chip.active{background:var(--lime);color:#0a0a0a;border-color:var(--lime)}
+
+.badge{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.s-booked{background:#1c2b45;color:var(--blue)}
+.s-inprogress{background:#3a2d10;color:var(--amber)}
+.s-completed{background:#1f3312;color:var(--lime)}
+.s-invoiced{background:#2b2b2b;color:#ddd}
+.s-paid{background:#143d1e;color:#5ee07a}
+.s-cancelled{background:#3b1c1c;color:var(--red)}
+
+.jobcard .veh{font-weight:700;font-size:17px}
+.jobcard .meta{color:var(--muted);font-size:13px;margin-top:3px}
+.jobcard .plate{display:inline-block;background:#f7e04d;color:#111;font-weight:700;letter-spacing:.1em;padding:2px 7px;border-radius:5px;font-size:12px;margin-left:6px;vertical-align:middle}
+.jobcard .cost{font-weight:700;font-size:16px;color:var(--lime)}
+.empty{text-align:center;color:var(--muted);padding:40px 20px}
+.empty svg{width:48px;height:48px;stroke:#444;fill:none;stroke-width:1.5;margin-bottom:10px}
+
+/* Sheet / modal */
+.sheet{position:fixed;inset:0;z-index:40;background:var(--bg);display:flex;flex-direction:column;transform:translateY(100%);transition:transform .22s ease;visibility:hidden}
+.sheet.open{transform:none;visibility:visible}
+.sheet .topbar{position:sticky}
+.sheet .content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(110px + var(--safe-b))}
+.sheet .footer{position:fixed;left:0;right:0;bottom:0;padding:12px 14px calc(12px + var(--safe-b));background:rgba(10,10,10,.95);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:flex;gap:10px;z-index:5}
+.iconbtn{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--text);background:var(--card);border:1px solid var(--line)}
+.iconbtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
+/* Steps */
+.steps{display:flex;gap:6px;margin:4px 0 16px}
+.steps span{flex:1;height:4px;border-radius:4px;background:var(--line)}
+.steps span.done{background:var(--lime)}
+
+/* Photos */
+.photogrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.photogrid .ph{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--card2);border:1px solid var(--line)}
+.photogrid .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.photogrid .ph .del{position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1}
+.photogrid .add{aspect-ratio:1;border-radius:10px;border:2px dashed #3a3a3a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--muted);font-size:12px;font-weight:600;text-transform:uppercase}
+.photogrid .add svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:2}
+#lightbox{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.96);display:flex;align-items:center;justify-content:center}
+#lightbox img{max-width:100%;max-height:100%}
+#lightbox .close{position:absolute;top:calc(14px + var(--safe-t));right:14px}
+
+/* Timer */
+.timerbox{background:linear-gradient(135deg,#182106,#0f0f0f);border:1px solid #2d3f0a;border-radius:var(--radius);padding:16px;text-align:center;margin-bottom:10px}
+.timerbox .t{font-size:40px;font-weight:700;letter-spacing:.04em;color:var(--lime);font-variant-numeric:tabular-nums}
+.timerbox .l{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+
+/* Calendar */
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-head h2{font-size:18px;text-transform:uppercase;letter-spacing:.04em}
+.cal-dow{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .d{aspect-ratio:1;border-radius:10px;background:var(--card);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-weight:600;font-size:14px;position:relative}
+.cal .d.other{opacity:.3}
+.cal .d.today{border-color:var(--lime)}
+.cal .d.sel{background:var(--lime);color:#0a0a0a}
+.cal .d .dots{display:flex;gap:2px;height:6px}
+.cal .d .dots i{width:6px;height:6px;border-radius:50%;background:var(--blue)}
+.cal .d.sel .dots i{background:#0a0a0a}
+.cal .d .dots i.ip{background:var(--amber)} .cal .d .dots i.done{background:var(--lime)}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px}
+.stat .v{font-size:26px;font-weight:700;color:var(--lime)}
+.stat .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+
+/* Toast */
+#toast{position:fixed;left:50%;bottom:calc(100px + var(--safe-b));transform:translateX(-50%) translateY(20px);background:#222;border:1px solid var(--line);color:var(--text);padding:10px 16px;border-radius:10px;font-weight:600;font-size:14px;opacity:0;transition:all .2s;z-index:70;pointer-events:none;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%)}
+.notice{background:#2a2410;border:1px solid #5a4a12;color:#ffd978;padding:12px 14px;border-radius:12px;font-size:14px;margin-bottom:12px}
+.notice code{background:#111;padding:1px 5px;border-radius:4px}
+.search{position:relative;margin-bottom:10px}
+.search .input{padding-left:40px}
+.search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:2}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:6px 10px;font-size:15px}
+.kv dt{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em;padding-top:3px}
+.kv dd{margin:0;overflow-wrap:anywhere}
+.links a{display:inline-flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--line);padding:9px 12px;border-radius:10px;text-decoration:none;color:var(--text);font-weight:600;font-size:13px;margin:4px 6px 0 0}
+.links a svg{width:16px;height:16px;stroke:var(--lime);fill:none;stroke-width:2.2}
+.toggle{display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid var(--line);border-radius:11px;padding:12px 14px;margin-bottom:12px}
+.sw{width:48px;height:28px;border-radius:999px;background:#333;position:relative;transition:.2s}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
+.sw.on{background:var(--lime)} .sw.on::after{left:23px}
+</style>
+</head>
+<body>
+
+<!-- ───────── AUTH ───────── -->
+<div id="authScreen">
+  <img src="logo.png" alt="CK Dentmaster">
+  <div class="authBox">
+    <h2>Sign in</h2>
+    <div id="cfgNotice" class="notice hidden">Firebase isn't configured yet. Paste your web app config into <code>firebase-config.js</code> (see README).</div>
+    <div class="field" style="margin:0"><label>User</label><div class="input" style="font-weight:700">Jay Khatri</div></div>
+    <div class="field" style="margin:0"><label>PIN</label><input id="authPin" class="input" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="••••" autocomplete="current-password" style="letter-spacing:.4em;font-size:22px;text-align:center"></div>
+    <button id="btnLogin" class="btn primary">Sign in</button>
+    <div id="authErr" class="small" style="color:var(--red)"></div>
+  </div>
+  <div id="installCard" class="authBox hidden" style="gap:8px">
+    <h2 style="font-size:15px">Add to your home screen</h2>
+    <div id="installIos" class="small muted hidden">In <b>Safari</b> tap the <b>Share</b> button <span style="display:inline-block;border:1px solid #555;border-radius:4px;padding:0 5px">⬆︎</span> then <b>Add to Home Screen</b>. The app then opens full-screen like a normal app.</div>
+    <div id="installAndroid" class="small muted hidden">In <b>Chrome</b> tap the menu <b>⋮</b> then <b>Add to Home screen</b> / <b>Install app</b>.</div>
+    <button id="btnInstall" class="btn sm primary hidden">Install app</button>
+  </div>
+</div>
+
+<!-- ───────── APP ───────── -->
+<div id="app" class="hidden">
+  <div class="topbar">
+    <img src="logo.png" alt="CK Dentmaster">
+    <div style="display:flex;gap:8px;align-items:center">
+      <span id="syncDot" title="Online" style="width:9px;height:9px;border-radius:50%;background:var(--lime);display:inline-block"></span>
+      <button class="iconbtn" id="btnSignOut" title="Sign out"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- JOBS -->
+    <div id="view-jobs">
+      <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input id="jobSearch" class="input" placeholder="Search reg, name, car, postcode…"></div>
+      <div class="chips" id="jobFilters">
+        <button class="chip active" data-f="open">Open</button>
+        <button class="chip" data-f="today">Today</button>
+        <button class="chip" data-f="week">This week</button>
+        <button class="chip" data-f="unpaid">Unpaid</button>
+        <button class="chip" data-f="all">All</button>
+      </div>
+      <div id="jobList"></div>
+    </div>
+
+    <!-- CALENDAR -->
+    <div id="view-calendar" class="hidden">
+      <div class="cal-head">
+        <button class="iconbtn" id="calPrev"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+        <h2 id="calTitle"></h2>
+        <button class="iconbtn" id="calNext"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
+      </div>
+      <div class="cal-dow"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+      <div class="cal" id="calGrid"></div>
+      <div class="section" id="calDayTitle">Jobs</div>
+      <div id="calDayList"></div>
+    </div>
+
+    <!-- CUSTOMERS -->
+    <div id="view-customers" class="hidden">
+      <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input id="custSearch" class="input" placeholder="Search customers…"></div>
+      <div id="custList"></div>
+    </div>
+
+    <!-- STATS -->
+    <div id="view-stats" class="hidden">
+      <div class="chips" id="statRange">
+        <button class="chip active" data-r="month">This month</button>
+        <button class="chip" data-r="last">Last month</button>
+        <button class="chip" data-r="year">This year</button>
+        <button class="chip" data-r="all">All time</button>
+      </div>
+      <div class="stats" id="statGrid"></div>
+      <div class="section">By manufacturer</div>
+      <div id="statMakes"></div>
+    </div>
+  </div>
+
+  <button class="fab" id="fabAdd" title="New job"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+
+  <nav class="bottomnav">
+    <button data-v="jobs" class="active"><svg viewBox="0 0 24 24"><path d="M3 7h18v13H3zM8 7V4h8v3"/></svg>Jobs</button>
+    <button data-v="calendar"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Calendar</button>
+    <button data-v="customers"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Customers</button>
+    <button data-v="stats"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Stats</button>
+  </nav>
+</div>
+
+<!-- ───────── JOB EDITOR SHEET ───────── -->
+<div class="sheet" id="jobSheet">
+  <div class="topbar">
+    <button class="iconbtn" id="jobSheetClose"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <div class="title" id="jobSheetTitle">New job</div>
+    <span style="width:40px"></span>
+  </div>
+  <div class="content">
+    <div class="steps"><span class="done"></span><span></span><span></span><span></span></div>
+
+    <!-- Step 1 Customer -->
+    <div class="step" data-step="1">
+      <div class="section">1 · Customer</div>
+      <div class="field"><label>Existing customer</label>
+        <select id="fCustPick" class="input"><option value="">— New customer —</option></select></div>
+      <div class="field"><label>Name</label><input id="fName" class="input" placeholder="Customer name" autocomplete="off"></div>
+      <div class="row">
+        <div class="field"><label>Phone</label><input id="fPhone" class="input" type="tel" inputmode="tel" placeholder="07…"></div>
+        <div class="field"><label>Email</label><input id="fEmail" class="input" type="email" inputmode="email" placeholder="optional"></div>
+      </div>
+      <div class="field"><label>Address</label><input id="fAddress" class="input" placeholder="Street, town"></div>
+      <div class="row">
+        <div class="field"><label>Postcode</label><input id="fPostcode" class="input" placeholder="e.g. SO42 7ZN" style="text-transform:uppercase"></div>
+        <div class="field"><label>Job location</label><select id="fLocation" class="input"><option>Customer's address</option><option>Workplace</option><option>Dealership</option><option>Workshop</option><option>Other</option></select></div>
+      </div>
+      <div class="field"><label>Location notes</label><input id="fLocationNote" class="input" placeholder="Car park level, gate code, etc."></div>
+    </div>
+
+    <!-- Step 2 Vehicle -->
+    <div class="step hidden" data-step="2">
+      <div class="section">2 · Vehicle</div>
+      <div class="field"><label>Registration</label><input id="fReg" class="input reg" placeholder="AB12 CDE" maxlength="9" autocomplete="off"></div>
+      <div class="field"><label>Manufacturer</label><select id="fMake" class="input"></select></div>
+      <div class="field" id="fMakeOtherWrap" style="display:none"><label>Manufacturer name</label><input id="fMakeOther" class="input" placeholder="Type manufacturer"></div>
+      <div class="field"><label>Model</label><select id="fModel" class="input"></select></div>
+      <div class="field" id="fModelOtherWrap" style="display:none"><label>Model name</label><input id="fModelOther" class="input" placeholder="Type model"></div>
+      <div class="row">
+        <div class="field"><label>Colour</label><select id="fColour" class="input"></select></div>
+        <div class="field"><label>Year</label><input id="fYear" class="input" inputmode="numeric" placeholder="e.g. 2021" maxlength="4"></div>
+      </div>
+    </div>
+
+    <!-- Step 3 Work -->
+    <div class="step hidden" data-step="3">
+      <div class="section">3 · Work required</div>
+      <div class="field"><label>Panels / areas</label>
+        <div class="chips" id="fPanels"></div></div>
+      <div class="field"><label>Description of works</label><textarea id="fDesc" class="input" placeholder="e.g. 2 x small dents on driver's door, 1 x crease on rear quarter. PDR, no paint."></textarea></div>
+      <div class="field"><label>Internal notes</label><textarea id="fNotes" class="input" style="min-height:70px" placeholder="Not shown to customer"></textarea></div>
+    </div>
+
+    <!-- Step 4 Booking & cost -->
+    <div class="step hidden" data-step="4">
+      <div class="section">4 · Booking &amp; cost</div>
+      <div class="row">
+        <div class="field"><label>Date</label><input id="fDate" class="input" type="date"></div>
+        <div class="field"><label>Time</label><input id="fTime" class="input" type="time"></div>
+      </div>
+      <div class="field"><label>Status</label><select id="fStatus" class="input">
+        <option>Booked</option><option>In progress</option><option>Completed</option><option>Invoiced</option><option>Paid</option><option>Cancelled</option></select></div>
+      <div class="row">
+        <div class="field"><label>Quoted (£)</label><input id="fQuote" class="input" inputmode="decimal" placeholder="0.00"></div>
+        <div class="field"><label>Charged (£)</label><input id="fCost" class="input" inputmode="decimal" placeholder="0.00"></div>
+      </div>
+      <div class="toggle"><span>Paid</span><button class="sw" id="fPaid" type="button"></button></div>
+      <div class="field"><label>Payment method</label><select id="fPayMethod" class="input"><option>Cash</option><option>Bank transfer</option><option>Card</option><option>Invoice</option><option>Other</option></select></div>
+    </div>
+  </div>
+  <div class="footer">
+    <button class="btn ghost" id="jobBack" style="width:40%">Back</button>
+    <button class="btn primary" id="jobNext">Next</button>
+  </div>
+</div>
+
+<!-- ───────── JOB DETAIL SHEET ───────── -->
+<div class="sheet" id="detailSheet">
+  <div class="topbar">
+    <button class="iconbtn" id="detailClose"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+    <div class="title">Job</div>
+    <button class="iconbtn" id="detailEdit" title="Edit"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+  </div>
+  <div class="content" id="detailBody"></div>
+</div>
+
+<!-- ───────── CUSTOMER DETAIL SHEET ───────── -->
+<div class="sheet" id="custSheet">
+  <div class="topbar">
+    <button class="iconbtn" id="custClose"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+    <div class="title">Customer</div>
+    <button class="iconbtn" id="custEdit" title="Edit"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+  </div>
+  <div class="content" id="custBody"></div>
+</div>
+
+<!-- ───────── CUSTOMER EDIT SHEET ───────── -->
+<div class="sheet" id="custEditSheet">
+  <div class="topbar">
+    <button class="iconbtn" id="custEditClose"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <div class="title">Edit customer</div><span style="width:40px"></span>
+  </div>
+  <div class="content">
+    <div class="field"><label>Name</label><input id="cName" class="input"></div>
+    <div class="row"><div class="field"><label>Phone</label><input id="cPhone" class="input" type="tel"></div><div class="field"><label>Email</label><input id="cEmail" class="input" type="email"></div></div>
+    <div class="field"><label>Address</label><input id="cAddress" class="input"></div>
+    <div class="field"><label>Postcode</label><input id="cPostcode" class="input" style="text-transform:uppercase"></div>
+    <div class="field"><label>Notes</label><textarea id="cNotes" class="input" style="min-height:80px"></textarea></div>
+    <button class="btn danger" id="custDelete">Delete customer</button>
+  </div>
+  <div class="footer"><button class="btn primary" id="custSave">Save</button></div>
+</div>
+
+<div id="lightbox" class="hidden"><img id="lightboxImg" alt=""><button class="iconbtn close" id="lightboxClose"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+<input type="file" id="photoInput" accept="image/*" multiple class="hidden">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<div id="toast"></div>
+
+<script src="firebase-config.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, addDoc, setDoc, updateDoc, deleteDoc, getDoc, getDocs, onSnapshot, query, orderBy, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+/* ───────── Reference data ───────── */
+const MAKES = {
+ "Audi":["A1","A3","A4","A5","A6","A7","A8","Q2","Q3","Q4 e-tron","Q5","Q7","Q8","TT","e-tron","RS3","RS4","RS6"],
+ "BMW":["1 Series","2 Series","3 Series","4 Series","5 Series","7 Series","8 Series","X1","X2","X3","X4","X5","X6","X7","i3","i4","iX","Z4","M2","M3","M4"],
+ "Citroën":["C1","C3","C3 Aircross","C4","C5 Aircross","Berlingo","DS3","Dispatch"],
+ "Cupra":["Formentor","Leon","Ateca","Born","Tavascan"],
+ "Dacia":["Sandero","Duster","Jogger","Spring"],
+ "DS":["DS 3","DS 4","DS 7"],
+ "Fiat":["500","500X","Panda","Tipo","Doblo","Ducato"],
+ "Ford":["Fiesta","Focus","Puma","Kuga","Mondeo","EcoSport","Mustang","Mustang Mach-E","Explorer","Transit","Transit Custom","Transit Connect","Ranger","Tourneo","Galaxy","S-Max","Ka+"],
+ "Honda":["Jazz","Civic","HR-V","CR-V","ZR-V","e","NSX"],
+ "Hyundai":["i10","i20","i30","Kona","Tucson","Santa Fe","Bayon","Ioniq 5","Ioniq 6"],
+ "Jaguar":["XE","XF","XJ","F-Pace","E-Pace","I-Pace","F-Type"],
+ "Jeep":["Renegade","Compass","Avenger","Wrangler","Grand Cherokee"],
+ "Kia":["Picanto","Rio","Ceed","XCeed","Niro","Sportage","Sorento","Stonic","EV3","EV6","EV9","Soul"],
+ "Land Rover":["Defender","Discovery","Discovery Sport","Range Rover","Range Rover Sport","Range Rover Evoque","Range Rover Velar","Freelander"],
+ "Lexus":["CT","IS","ES","NX","RX","UX","LBX","RZ"],
+ "Mazda":["2","3","6","CX-3","CX-30","CX-5","CX-60","MX-5","MX-30"],
+ "Mercedes-Benz":["A-Class","B-Class","C-Class","CLA","CLS","E-Class","S-Class","GLA","GLB","GLC","GLE","GLS","EQA","EQB","EQC","EQE","EQS","Vito","Sprinter","V-Class","SL","AMG GT"],
+ "MG":["MG3","MG4","MG5","ZS","HS","MG ZS EV","Cyberster"],
+ "Mini":["Hatch 3dr","Hatch 5dr","Convertible","Clubman","Countryman","Electric","Aceman"],
+ "Mitsubishi":["Outlander","ASX","L200","Eclipse Cross"],
+ "Nissan":["Micra","Juke","Qashqai","X-Trail","Leaf","Ariya","Navara","NV200","370Z","GT-R"],
+ "Peugeot":["108","208","2008","308","3008","408","508","5008","Partner","Expert","Boxer","Rifter"],
+ "Polestar":["2","3","4"],
+ "Porsche":["911","Cayenne","Macan","Panamera","Taycan","Boxster","Cayman"],
+ "Renault":["Clio","Captur","Megane","Austral","Arkana","Kadjar","Zoe","Scenic","Kangoo","Trafic","Master"],
+ "SEAT":["Ibiza","Leon","Arona","Ateca","Tarraco","Alhambra"],
+ "Škoda":["Fabia","Scala","Octavia","Superb","Kamiq","Karoq","Kodiaq","Enyaq","Elroq"],
+ "Smart":["ForTwo","ForFour","#1","#3"],
+ "Subaru":["Impreza","Forester","Outback","XV","Crosstrek"],
+ "Suzuki":["Swift","Ignis","Vitara","S-Cross","Jimny","Swace","Across"],
+ "Tesla":["Model 3","Model Y","Model S","Model X","Cybertruck"],
+ "Toyota":["Aygo","Aygo X","Yaris","Yaris Cross","Corolla","C-HR","RAV4","Camry","Prius","bZ4X","Hilux","Land Cruiser","Proace","GR86","Supra"],
+ "Vauxhall":["Corsa","Astra","Mokka","Crossland","Grandland","Insignia","Zafira","Vivaro","Combo","Movano","Adam","Meriva"],
+ "Volkswagen":["Up!","Polo","Golf","T-Roc","T-Cross","Taigo","Tiguan","Touareg","Passat","Arteon","ID.3","ID.4","ID.5","ID.7","ID. Buzz","Touran","Sharan","Caddy","Transporter","Crafter","Amarok","Scirocco"],
+ "Volvo":["XC40","XC60","XC90","EX30","EX90","S60","S90","V60","V90","C40"]
+};
+const COLOURS=["White","Black","Silver","Grey","Blue","Red","Green","Yellow","Orange","Brown","Beige","Gold","Bronze","Purple","Pink","Maroon","Other"];
+const PANELS=["Bonnet","Roof","Boot/Tailgate","Front wing (NS)","Front wing (OS)","Rear quarter (NS)","Rear quarter (OS)","Front door (NS)","Front door (OS)","Rear door (NS)","Rear door (OS)","Front bumper","Rear bumper","Sill","Pillar","Hail damage"];
+const STATUS_CLASS={"Booked":"s-booked","In progress":"s-inprogress","Completed":"s-completed","Invoiced":"s-invoiced","Paid":"s-paid","Cancelled":"s-cancelled"};
+
+/* ───────── Helpers ───────── */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money=n=>"£"+(Number(n)||0).toLocaleString("en-GB",{minimumFractionDigits:2,maximumFractionDigits:2});
+const pad=n=>String(n).padStart(2,"0");
+const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const todayStr=()=>ymd(new Date());
+const fmtDate=s=>{if(!s)return"";const d=new Date(s+"T00:00:00");return d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short",year:"numeric"})};
+const fmtDur=ms=>{if(!ms||ms<0)return"0m";const m=Math.round(ms/60000),h=Math.floor(m/60);return h?`${h}h ${pad(m%60)}m`:`${m}m`};
+const fmtClock=ms=>{const s=Math.floor(ms/1000);return `${pad(Math.floor(s/3600))}:${pad(Math.floor(s%3600/60))}:${pad(s%60)}`};
+const fmtReg=r=>{r=(r||"").toUpperCase().replace(/[^A-Z0-9]/g,"");return /^[A-Z]{2}\d{2}[A-Z]{3}$/.test(r)?r.slice(0,4)+" "+r.slice(4):r};
+let toastT;function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),2200)}
+const vehLabel=j=>[j.make,j.model].filter(Boolean).join(" ")||"Vehicle";
+
+/* ───────── Firebase ───────── */
+const cfg=window.CK_FIREBASE_CONFIG||{};
+const configured=cfg.apiKey&&!cfg.apiKey.startsWith("PASTE");
+if(!configured)$("#cfgNotice").classList.remove("hidden");
+let auth,db,user=null;
+if(configured){
+  const app=initializeApp(cfg);
+  auth=getAuth(app);
+  db=initializeFirestore(app,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})});
+}
+const APP_URL=location.origin+location.pathname.replace(/[^/]*$/,"");
+window.addEventListener("online",()=>$("#syncDot").style.background="var(--lime)");
+window.addEventListener("offline",()=>$("#syncDot").style.background="var(--amber)");
+
+/* Single user: the PIN is turned into the Firebase password "ckdm-<PIN>" for the account below.
+   Create that user in Firebase Console → Authentication → Users (email below, password ckdm-0000).
+   To change the PIN later, change that user's password in Firebase to ckdm-<new PIN>. */
+const LOGIN_EMAIL="jay@ckdentmaster.app";
+$("#btnLogin").onclick=async()=>{
+  if(!configured)return;
+  $("#authErr").textContent="";
+  const pin=$("#authPin").value.trim();if(!pin)return;
+  try{await setPersistence(auth,browserLocalPersistence);await signInWithEmailAndPassword(auth,LOGIN_EMAIL,"ckdm-"+pin)}
+  catch(e){$("#authErr").textContent=e.code==="auth/invalid-credential"||e.code==="auth/wrong-password"?"Wrong PIN.":e.code==="auth/too-many-requests"?"Too many attempts – wait a few minutes.":e.message}
+};
+$("#authPin").addEventListener("keydown",e=>{if(e.key==="Enter")$("#btnLogin").click()});
+
+/* Install (add to home screen) guidance */
+const standalone=window.matchMedia("(display-mode: standalone)").matches||navigator.standalone;
+const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+let installEvt=null;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvt=e;$("#btnInstall").classList.remove("hidden");$("#installAndroid").classList.add("hidden")});
+$("#btnInstall").onclick=()=>{if(installEvt){installEvt.prompt();installEvt=null}};
+if(!standalone){$("#installCard").classList.remove("hidden");(isIOS?$("#installIos"):$("#installAndroid")).classList.remove("hidden")}
+$("#btnSignOut").onclick=()=>{if(confirm("Sign out?"))signOut(auth)};
+
+/* ───────── State ───────── */
+let jobs=[],customers=[],vehicleExtras={makes:{}};
+let jobFilter="open",statRange="month",calMonth=new Date(),calSel=todayStr();
+let unsub=[];
+
+if(configured)onAuthStateChanged(auth,u=>{
+  user=u; unsub.forEach(f=>f()); unsub=[];
+  if(u){
+    $("#authScreen").classList.add("hidden");$("#app").classList.remove("hidden");
+    unsub.push(onSnapshot(query(collection(db,"jobs"),orderBy("bookedDate","asc")),s=>{jobs=s.docs.map(d=>({id:d.id,...d.data()}));renderAll()}));
+    unsub.push(onSnapshot(query(collection(db,"customers"),orderBy("name","asc")),s=>{customers=s.docs.map(d=>({id:d.id,...d.data()}));renderCustomers();fillCustPick()}));
+    unsub.push(onSnapshot(doc(db,"settings","vehicles"),s=>{vehicleExtras=s.exists()?s.data():{makes:{}};fillMakes()}));
+  }else{$("#authScreen").classList.remove("hidden");$("#app").classList.add("hidden")}
+});
+
+/* ───────── Navigation ───────── */
+$$(".bottomnav button").forEach(b=>b.onclick=()=>showView(b.dataset.v));
+function showView(v){
+  $$(".bottomnav button").forEach(b=>b.classList.toggle("active",b.dataset.v===v));
+  ["jobs","calendar","customers","stats"].forEach(x=>$("#view-"+x).classList.toggle("hidden",x!==v));
+  $("#fabAdd").classList.toggle("hidden",v==="stats");
+  if(v==="calendar")renderCalendar(); if(v==="stats")renderStats();
+  window.scrollTo(0,0);
+}
+function renderAll(){renderJobs();if(!$("#view-calendar").classList.contains("hidden"))renderCalendar();if(!$("#view-stats").classList.contains("hidden"))renderStats();if(!$("#view-customers").classList.contains("hidden"))renderCustomers();if(openJobId)renderDetail(openJobId)}
+
+/* ───────── Jobs list ───────── */
+$("#jobFilters").onclick=e=>{const c=e.target.closest(".chip");if(!c)return;jobFilter=c.dataset.f;$$("#jobFilters .chip").forEach(x=>x.classList.toggle("active",x===c));renderJobs()};
+$("#jobSearch").oninput=renderJobs;
+function weekRange(){const d=new Date();const day=(d.getDay()+6)%7;const mon=new Date(d);mon.setDate(d.getDate()-day);const sun=new Date(mon);sun.setDate(mon.getDate()+6);return[ymd(mon),ymd(sun)]}
+function filteredJobs(){
+  const q=$("#jobSearch").value.trim().toLowerCase(),t=todayStr(),[ws,we]=weekRange();
+  return jobs.filter(j=>{
+    if(q){const hay=[j.reg,j.customerName,j.make,j.model,j.colour,j.postcode,j.description].join(" ").toLowerCase();if(!hay.includes(q))return false}
+    switch(jobFilter){
+      case"open":return!["Paid","Cancelled"].includes(j.status);
+      case"today":return j.bookedDate===t;
+      case"week":return j.bookedDate>=ws&&j.bookedDate<=we;
+      case"unpaid":return!j.paid&&j.status!=="Cancelled"&&["Completed","Invoiced"].includes(j.status);
+      default:return true;
+    }
+  }).sort((a,b)=>{
+    if(jobFilter==="all")return(b.bookedDate||"").localeCompare(a.bookedDate||"")||(b.bookedTime||"").localeCompare(a.bookedTime||"");
+    return(a.bookedDate||"9").localeCompare(b.bookedDate||"9")||(a.bookedTime||"").localeCompare(b.bookedTime||"");
+  });
+}
+function jobCard(j){
+  const cost=j.cost?money(j.cost):(j.quote?`<span class="muted">Q </span>${money(j.quote)}`:"");
+  return`<div class="card tap jobcard" data-id="${j.id}">
+    <div class="spread"><div class="veh">${esc(vehLabel(j))}${j.reg?`<span class="plate">${esc(fmtReg(j.reg))}</span>`:""}</div><span class="badge ${STATUS_CLASS[j.status]||""}">${esc(j.status||"")}</span></div>
+    <div class="meta">${esc(j.colour||"")}${j.colour&&j.customerName?" · ":""}${esc(j.customerName||"")}${j.postcode?" · "+esc(j.postcode):""}</div>
+    <div class="spread" style="margin-top:8px"><div class="small muted">${j.bookedDate?fmtDate(j.bookedDate):"<i>Not booked</i>"}${j.bookedTime?" · "+esc(j.bookedTime):""}</div><div class="cost">${cost}${j.paid?' <span class="badge s-paid">Paid</span>':""}</div></div>
+  </div>`;
+}
+function renderJobs(){
+  const list=filteredJobs();
+  $("#jobList").innerHTML=list.length?list.map(jobCard).join(""):`<div class="empty"><svg viewBox="0 0 24 24"><path d="M3 7h18v13H3zM8 7V4h8v3"/></svg><div>No jobs here yet.<br>Tap + to add one.</div></div>`;
+}
+document.body.addEventListener("click",e=>{const c=e.target.closest(".jobcard");if(c)openDetail(c.dataset.id)});
+
+/* ───────── Calendar ───────── */
+$("#calPrev").onclick=()=>{calMonth.setMonth(calMonth.getMonth()-1);renderCalendar()};
+$("#calNext").onclick=()=>{calMonth.setMonth(calMonth.getMonth()+1);renderCalendar()};
+function renderCalendar(){
+  const y=calMonth.getFullYear(),m=calMonth.getMonth();
+  $("#calTitle").textContent=calMonth.toLocaleDateString("en-GB",{month:"long",year:"numeric"});
+  const first=new Date(y,m,1),start=new Date(first);start.setDate(1-((first.getDay()+6)%7));
+  const byDay={};jobs.forEach(j=>{if(j.bookedDate&&j.status!=="Cancelled")(byDay[j.bookedDate]=byDay[j.bookedDate]||[]).push(j)});
+  let html="";const t=todayStr();
+  for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const k=ymd(d);const js=byDay[k]||[];
+    html+=`<div class="d ${d.getMonth()!==m?"other":""} ${k===t?"today":""} ${k===calSel?"sel":""}" data-d="${k}">${d.getDate()}<div class="dots">${js.slice(0,3).map(j=>`<i class="${j.status==="In progress"?"ip":["Completed","Invoiced","Paid"].includes(j.status)?"done":""}"></i>`).join("")}</div></div>`}
+  $("#calGrid").innerHTML=html;
+  $$("#calGrid .d").forEach(el=>el.onclick=()=>{calSel=el.dataset.d;renderCalendar()});
+  const day=(byDay[calSel]||[]).sort((a,b)=>(a.bookedTime||"").localeCompare(b.bookedTime||""));
+  $("#calDayTitle").textContent=fmtDate(calSel)+(day.length?` · ${day.length} job${day.length>1?"s":""}`:"");
+  $("#calDayList").innerHTML=day.length?day.map(jobCard).join(""):`<div class="empty small">Nothing booked. <a href="#" id="calAdd">Add a job on this day</a></div>`;
+  const a=$("#calAdd");if(a)a.onclick=e=>{e.preventDefault();openEditor(null,calSel)};
+}
+
+/* ───────── Customers ───────── */
+$("#custSearch").oninput=renderCustomers;
+function renderCustomers(){
+  const q=$("#custSearch").value.trim().toLowerCase();
+  const list=customers.filter(c=>!q||[c.name,c.phone,c.postcode,c.address,c.email].join(" ").toLowerCase().includes(q));
+  $("#custList").innerHTML=list.length?list.map(c=>{const n=jobs.filter(j=>j.customerId===c.id).length;
+    return`<div class="card tap custcard" data-id="${c.id}"><div class="spread"><div><div style="font-weight:700;font-size:16px">${esc(c.name)}</div><div class="small muted">${esc(c.phone||"")}${c.postcode?" · "+esc(c.postcode):""}</div></div><div class="small muted">${n} job${n===1?"":"s"}</div></div></div>`}).join(""):
+    `<div class="empty">No customers yet. They're created when you add a job.</div>`;
+  $$(".custcard").forEach(el=>el.onclick=()=>openCustomer(el.dataset.id));
+}
+function fillCustPick(){const s=$("#fCustPick");const cur=s.value;s.innerHTML=`<option value="">— New customer —</option>`+customers.map(c=>`<option value="${c.id}">${esc(c.name)}${c.postcode?" ("+esc(c.postcode)+")":""}</option>`).join("");s.value=cur}
+$("#fCustPick").onchange=()=>{const c=customers.find(x=>x.id===$("#fCustPick").value);if(!c)return;$("#fName").value=c.name||"";$("#fPhone").value=c.phone||"";$("#fEmail").value=c.email||"";$("#fAddress").value=c.address||"";$("#fPostcode").value=c.postcode||""};
+
+let openCustId=null;
+function openCustomer(id){openCustId=id;const c=customers.find(x=>x.id===id);if(!c)return;
+  const cj=jobs.filter(j=>j.customerId===id).sort((a,b)=>(b.bookedDate||"").localeCompare(a.bookedDate||""));
+  const total=cj.filter(j=>j.paid).reduce((s,j)=>s+(Number(j.cost)||0),0);
+  $("#custBody").innerHTML=`<div class="card"><h2 style="font-size:20px">${esc(c.name)}</h2>
+    <div class="links">${c.phone?`<a href="tel:${esc(c.phone)}"><svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7l.7 3.3a2 2 0 0 1-.5 1.9L8 10.2a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 1.9-.5l3.3.7a2 2 0 0 1 1.5 2Z"/></svg>Call</a><a href="sms:${esc(c.phone)}"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Text</a>`:""}
+    ${c.email?`<a href="mailto:${esc(c.email)}"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>Email</a>`:""}
+    ${(c.address||c.postcode)?`<a href="https://maps.google.com/?q=${encodeURIComponent([c.address,c.postcode].filter(Boolean).join(", "))}" target="_blank"><svg viewBox="0 0 24 24"><path d="M12 22s7-7 7-12a7 7 0 1 0-14 0c0 5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>Map</a>`:""}</div>
+    <dl class="kv" style="margin-top:12px"><dt>Address</dt><dd>${esc([c.address,c.postcode].filter(Boolean).join(", ")||"—")}</dd><dt>Notes</dt><dd>${esc(c.notes||"—")}</dd><dt>Paid total</dt><dd style="color:var(--lime);font-weight:700">${money(total)}</dd></dl></div>
+    <button class="btn primary" id="custNewJob">+ New job for ${esc(c.name.split(" ")[0])}</button>
+    <div class="section">Jobs (${cj.length})</div>${cj.map(jobCard).join("")||'<div class="muted small">No jobs yet.</div>'}`;
+  $("#custNewJob").onclick=()=>{closeSheet("#custSheet");openEditor(null,null,c)};
+  openSheet("#custSheet");
+}
+$("#custClose").onclick=()=>closeSheet("#custSheet");
+$("#custEdit").onclick=()=>{const c=customers.find(x=>x.id===openCustId);if(!c)return;$("#cName").value=c.name||"";$("#cPhone").value=c.phone||"";$("#cEmail").value=c.email||"";$("#cAddress").value=c.address||"";$("#cPostcode").value=c.postcode||"";$("#cNotes").value=c.notes||"";openSheet("#custEditSheet")};
+$("#custEditClose").onclick=()=>closeSheet("#custEditSheet");
+$("#custSave").onclick=async()=>{const data={name:$("#cName").value.trim(),phone:$("#cPhone").value.trim(),email:$("#cEmail").value.trim(),address:$("#cAddress").value.trim(),postcode:$("#cPostcode").value.trim().toUpperCase(),notes:$("#cNotes").value.trim(),updatedAt:serverTimestamp()};
+  if(!data.name)return toast("Name is required");
+  await updateDoc(doc(db,"customers",openCustId),data);
+  const b=writeBatch(db);jobs.filter(j=>j.customerId===openCustId).forEach(j=>b.update(doc(db,"jobs",j.id),{customerName:data.name,customerPhone:data.phone,customerAddress:data.address,postcode:data.postcode}));await b.commit();
+  closeSheet("#custEditSheet");toast("Customer saved");setTimeout(()=>openCustomer(openCustId),300)};
+$("#custDelete").onclick=async()=>{const n=jobs.filter(j=>j.customerId===openCustId).length;if(n)return toast(`Delete this customer's ${n} job(s) first`);if(!confirm("Delete this customer?"))return;await deleteDoc(doc(db,"customers",openCustId));closeSheet("#custEditSheet");closeSheet("#custSheet");toast("Customer deleted")};
+
+/* ───────── Sheets ───────── */
+function openSheet(s){$(s).classList.add("open");document.body.style.overflow="hidden"}
+function closeSheet(s){$(s).classList.remove("open");if(!$$(".sheet.open").length)document.body.style.overflow=""}
+
+/* ───────── Job editor ───────── */
+let editId=null,step=1,panelsSel=new Set(),paid=false;
+function fillMakes(){const s=$("#fMake");const cur=s.value;const all=[...new Set([...Object.keys(MAKES),...Object.keys(vehicleExtras.makes||{})])].sort((a,b)=>a.localeCompare(b));
+  s.innerHTML=`<option value="">Select manufacturer</option>`+all.map(m=>`<option>${esc(m)}</option>`).join("")+`<option value="__other">Other / add new…</option>`;s.value=cur;fillModels()}
+function modelsFor(make){return[...new Set([...(MAKES[make]||[]),...((vehicleExtras.makes||{})[make]||[])])].sort((a,b)=>a.localeCompare(b))}
+function fillModels(){const mk=$("#fMake").value,s=$("#fModel"),cur=s.value;$("#fMakeOtherWrap").style.display=mk==="__other"?"":"none";
+  const ms=mk&&mk!=="__other"?modelsFor(mk):[];s.innerHTML=`<option value="">Select model</option>`+ms.map(m=>`<option>${esc(m)}</option>`).join("")+`<option value="__other">Other / add new…</option>`;s.value=ms.includes(cur)?cur:"";$("#fModelOtherWrap").style.display=s.value==="__other"?"":"none"}
+$("#fMake").onchange=fillModels;$("#fModel").onchange=()=>$("#fModelOtherWrap").style.display=$("#fModel").value==="__other"?"":"none";
+$("#fColour").innerHTML=COLOURS.map(c=>`<option>${c}</option>`).join("");
+$("#fPanels").innerHTML=PANELS.map(p=>`<button type="button" class="chip" data-p="${esc(p)}">${esc(p)}</button>`).join("");
+$("#fPanels").style.flexWrap="wrap";
+$("#fPanels").onclick=e=>{const c=e.target.closest(".chip");if(!c)return;const p=c.dataset.p;panelsSel.has(p)?panelsSel.delete(p):panelsSel.add(p);c.classList.toggle("active",panelsSel.has(p))};
+$("#fPaid").onclick=()=>{paid=!paid;$("#fPaid").classList.toggle("on",paid);if(paid&&$("#fStatus").value!=="Cancelled")$("#fStatus").value="Paid"};
+$("#fStatus").onchange=()=>{if($("#fStatus").value==="Paid"&&!paid)$("#fPaid").click()};
+$("#fReg").oninput=e=>{e.target.value=fmtReg(e.target.value)};
+
+$("#fabAdd").onclick=()=>openEditor(null);
+function openEditor(id,date,cust){
+  editId=id;step=1;panelsSel=new Set();paid=false;$("#fPaid").classList.remove("on");
+  ["fName","fPhone","fEmail","fAddress","fPostcode","fLocationNote","fReg","fMakeOther","fModelOther","fYear","fDesc","fNotes","fTime","fQuote","fCost"].forEach(i=>$("#"+i).value="");
+  $("#fCustPick").value="";$("#fLocation").value="Customer's address";$("#fMake").value="";fillModels();$("#fColour").value="White";$("#fStatus").value="Booked";$("#fPayMethod").value="Bank transfer";$("#fDate").value=date||"";
+  $("#jobSheetTitle").textContent=id?"Edit job":"New job";
+  if(cust){$("#fCustPick").value=cust.id;$("#fCustPick").onchange()}
+  if(id){const j=jobs.find(x=>x.id===id);if(j){
+    $("#fCustPick").value=j.customerId||"";$("#fName").value=j.customerName||"";$("#fPhone").value=j.customerPhone||"";$("#fEmail").value=j.customerEmail||"";$("#fAddress").value=j.customerAddress||"";$("#fPostcode").value=j.postcode||"";
+    $("#fLocation").value=j.location||"Customer's address";$("#fLocationNote").value=j.locationNote||"";
+    $("#fReg").value=j.reg||"";
+    if(j.make){if([...$("#fMake").options].some(o=>o.value===j.make))$("#fMake").value=j.make;else{$("#fMake").value="__other";$("#fMakeOther").value=j.make}}fillModels();
+    if(j.model){if([...$("#fModel").options].some(o=>o.value===j.model))$("#fModel").value=j.model;else{$("#fModel").value="__other";$("#fModelOther").value=j.model;$("#fModelOtherWrap").style.display=""}}
+    $("#fColour").value=COLOURS.includes(j.colour)?j.colour:"Other";$("#fYear").value=j.year||"";
+    (j.panels||[]).forEach(p=>panelsSel.add(p));$("#fDesc").value=j.description||"";$("#fNotes").value=j.notes||"";
+    $("#fDate").value=j.bookedDate||"";$("#fTime").value=j.bookedTime||"";$("#fStatus").value=j.status||"Booked";$("#fQuote").value=j.quote||"";$("#fCost").value=j.cost||"";$("#fPayMethod").value=j.payMethod||"Bank transfer";
+    paid=!!j.paid;$("#fPaid").classList.toggle("on",paid);
+  }}
+  $$("#fPanels .chip").forEach(c=>c.classList.toggle("active",panelsSel.has(c.dataset.p)));
+  showStep(1);openSheet("#jobSheet");
+}
+function showStep(n){step=n;$$("#jobSheet .step").forEach(s=>s.classList.toggle("hidden",Number(s.dataset.step)!==n));$$("#jobSheet .steps span").forEach((s,i)=>s.classList.toggle("done",i<n));
+  $("#jobBack").textContent=n===1?"Cancel":"Back";$("#jobNext").textContent=n===4?(editId?"Save changes":"Save job"):"Next";$("#jobSheet .content").scrollTo(0,0);window.scrollTo(0,0)}
+$("#jobSheetClose").onclick=()=>closeSheet("#jobSheet");
+$("#jobBack").onclick=()=>step===1?closeSheet("#jobSheet"):showStep(step-1);
+$("#jobNext").onclick=async()=>{
+  if(step===1&&!$("#fName").value.trim())return toast("Enter the customer's name");
+  if(step===2){const mk=$("#fMake").value;if(!mk||(mk==="__other"&&!$("#fMakeOther").value.trim()))return toast("Select the manufacturer")}
+  if(step<4)return showStep(step+1);
+  await saveJob();
+};
+async function saveJob(){
+  $("#jobNext").disabled=true;
+  try{
+    const make=$("#fMake").value==="__other"?$("#fMakeOther").value.trim():$("#fMake").value;
+    const model=$("#fModel").value==="__other"?$("#fModelOther").value.trim():$("#fModel").value;
+    // remember new makes/models
+    const known=modelsFor(make);const isNewMake=!MAKES[make]&&!(vehicleExtras.makes||{})[make];
+    if(make&&((model&&!known.includes(model))||isNewMake)){const ex={...(vehicleExtras.makes||{})};ex[make]=[...new Set([...(ex[make]||[]),...(model?[model]:[])])];await setDoc(doc(db,"settings","vehicles"),{makes:ex},{merge:true})}
+    // customer
+    const cust={name:$("#fName").value.trim(),phone:$("#fPhone").value.trim(),email:$("#fEmail").value.trim(),address:$("#fAddress").value.trim(),postcode:$("#fPostcode").value.trim().toUpperCase(),updatedAt:serverTimestamp()};
+    let customerId=$("#fCustPick").value;
+    if(customerId){await updateDoc(doc(db,"customers",customerId),cust)}
+    else{const existing=customers.find(c=>c.phone&&cust.phone&&c.phone.replace(/\s/g,"")===cust.phone.replace(/\s/g,""));
+      if(existing){customerId=existing.id;await updateDoc(doc(db,"customers",customerId),cust)}else{const r=await addDoc(collection(db,"customers"),{...cust,createdAt:serverTimestamp()});customerId=r.id}}
+    const data={customerId,customerName:cust.name,customerPhone:cust.phone,customerEmail:cust.email,customerAddress:cust.address,postcode:cust.postcode,
+      location:$("#fLocation").value,locationNote:$("#fLocationNote").value.trim(),
+      reg:fmtReg($("#fReg").value),make,model,colour:$("#fColour").value,year:$("#fYear").value.trim(),
+      panels:[...panelsSel],description:$("#fDesc").value.trim(),notes:$("#fNotes").value.trim(),
+      bookedDate:$("#fDate").value||"",bookedTime:$("#fTime").value||"",status:$("#fStatus").value,
+      quote:Number($("#fQuote").value)||0,cost:Number($("#fCost").value)||0,paid,payMethod:$("#fPayMethod").value,updatedAt:serverTimestamp()};
+    if(paid&&!(editId&&jobs.find(j=>j.id===editId)?.paidAt))data.paidAt=Date.now();
+    const isNew=!editId;
+    if(editId)await updateDoc(doc(db,"jobs",editId),data);
+    else{const r=await addDoc(collection(db,"jobs"),{...data,createdAt:serverTimestamp(),photoCount:0});editId=r.id}
+    closeSheet("#jobSheet");toast(isNew?"Job added":"Job saved");
+    if(!openJobId)openDetail(editId);
+  }catch(e){console.error(e);toast("Save failed: "+e.message)}
+  $("#jobNext").disabled=false;
+}
+
+/* ───────── Job detail ───────── */
+let openJobId=null,photos=[],photoUnsub=null,timerInt=null;
+function openDetail(id){openJobId=id;photos=[];if(photoUnsub)photoUnsub();
+  photoUnsub=onSnapshot(query(collection(db,"jobs",id,"photos"),orderBy("createdAt","asc")),s=>{photos=s.docs.map(d=>({id:d.id,...d.data()}));renderDetail(id)});
+  renderDetail(id);openSheet("#detailSheet")}
+$("#detailClose").onclick=()=>{closeSheet("#detailSheet");openJobId=null;if(photoUnsub)photoUnsub();clearInterval(timerInt)};
+$("#detailEdit").onclick=()=>openEditor(openJobId);
+function renderDetail(id){const j=jobs.find(x=>x.id===id);if(!j){$("#detailBody").innerHTML='<div class="empty">Job not found.</div>';return}
+  const addr=[j.customerAddress,j.postcode].filter(Boolean).join(", ");
+  const dur=j.startedAt&&j.finishedAt?j.finishedAt-j.startedAt:0;
+  const running=j.status==="In progress"&&j.startedAt&&!j.finishedAt;
+  const before=photos.filter(p=>p.type==="before"),after=photos.filter(p=>p.type==="after");
+  const grid=(arr,type)=>`<div class="photogrid">${arr.map(p=>`<div class="ph"><img src="${p.data}" data-full="${p.id}" alt=""><button class="del" data-del="${p.id}">×</button></div>`).join("")}
+    <button class="add" data-add="${type}"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Add photo</button></div>`;
+  $("#detailBody").innerHTML=`
+    <div class="card"><div class="spread"><div><div style="font-size:22px;font-weight:700">${esc(vehLabel(j))}</div><div class="muted">${esc([j.colour,j.year].filter(Boolean).join(" · "))}</div></div>${j.reg?`<span class="plate" style="background:#f7e04d;color:#111;font-weight:700;letter-spacing:.1em;padding:5px 10px;border-radius:6px;font-size:15px">${esc(fmtReg(j.reg))}</span>`:""}</div>
+      <div style="margin-top:10px"><span class="badge ${STATUS_CLASS[j.status]||""}">${esc(j.status)}</span> ${j.paid?'<span class="badge s-paid">Paid</span>':""}</div></div>
+
+    ${j.status!=="Cancelled"?`<div class="timerbox"><div class="l">${running?"In progress":dur?"Time on job":"Job timer"}</div><div class="t" id="timerDisp">${running?fmtClock(Date.now()-j.startedAt):dur?fmtDur(dur):"--:--:--"}</div>
+      <div style="display:flex;gap:10px;margin-top:12px">${!j.startedAt?`<button class="btn primary" id="btnStart">▶ Start job</button>`:running?`<button class="btn primary" id="btnFinish">■ Finish job</button>`:`<button class="btn sm ghost" id="btnRestart">Restart timer</button>`}</div>
+      ${j.startedAt?`<div class="small muted" style="margin-top:8px">Started ${new Date(j.startedAt).toLocaleString("en-GB",{weekday:"short",hour:"2-digit",minute:"2-digit",day:"numeric",month:"short"})}${j.finishedAt?" · Finished "+new Date(j.finishedAt).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}):""}</div>`:""}</div>`:""}
+
+    <div class="section">Booking</div>
+    <div class="card"><dl class="kv"><dt>Date</dt><dd>${j.bookedDate?fmtDate(j.bookedDate):"Not booked"}${j.bookedTime?" at "+esc(j.bookedTime):""}</dd><dt>Location</dt><dd>${esc(j.location||"")}${j.locationNote?" — "+esc(j.locationNote):""}</dd></dl></div>
+
+    <div class="section">Customer</div>
+    <div class="card"><div style="font-weight:700;font-size:17px">${esc(j.customerName||"")}</div><div class="small muted">${esc(addr||"")}</div>
+      <div class="links">${j.customerPhone?`<a href="tel:${esc(j.customerPhone)}"><svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7l.7 3.3a2 2 0 0 1-.5 1.9L8 10.2a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 1.9-.5l3.3.7a2 2 0 0 1 1.5 2Z"/></svg>Call</a><a href="sms:${esc(j.customerPhone)}"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Text</a>`:""}
+      ${addr?`<a href="https://maps.google.com/?q=${encodeURIComponent(addr)}" target="_blank"><svg viewBox="0 0 24 24"><path d="M12 22s7-7 7-12a7 7 0 1 0-14 0c0 5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>Navigate</a>`:""}
+      ${j.customerId?`<a href="#" id="dCust"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Profile</a>`:""}</div></div>
+
+    <div class="section">Work</div>
+    <div class="card">${(j.panels||[]).length?`<div style="margin-bottom:8px">${j.panels.map(p=>`<span class="badge s-invoiced" style="margin:0 4px 4px 0">${esc(p)}</span>`).join("")}</div>`:""}<div style="white-space:pre-wrap">${esc(j.description||"No description")}</div>${j.notes?`<div class="small muted" style="margin-top:10px;white-space:pre-wrap">📝 ${esc(j.notes)}</div>`:""}</div>
+
+    <div class="section">Before photos (${before.length})</div>${grid(before,"before")}
+    <div class="section">After photos (${after.length})</div>${grid(after,"after")}
+
+    <div class="section">Cost</div>
+    <div class="card"><dl class="kv"><dt>Quoted</dt><dd>${money(j.quote)}</dd><dt>Charged</dt><dd style="color:var(--lime);font-weight:700;font-size:18px">${money(j.cost)}</dd><dt>Payment</dt><dd>${j.paid?`Paid · ${esc(j.payMethod||"")}${j.paidAt?" · "+new Date(j.paidAt).toLocaleDateString("en-GB"):""}`:"Outstanding"}</dd></dl>
+      ${!j.paid&&j.status!=="Cancelled"?`<button class="btn primary" style="margin-top:12px" id="btnMarkPaid">Mark as paid</button>`:""}</div>
+
+    <div class="section">Report &amp; sharing</div>
+    <div class="card" style="display:flex;flex-direction:column;gap:10px">
+      <button class="btn primary" id="btnPdf"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M9 15h6M9 11h2"/></svg>Create PDF report</button>
+      <button class="btn" id="btnLink"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>${j.shareToken?"Share job link":"Create job link"}</button>
+      <button class="btn ghost" id="btnShare">Share text summary</button>
+      ${j.shareToken?`<div class="small muted" style="overflow-wrap:anywhere">${esc(APP_URL+"report.html?r="+j.shareToken)} · <a href="#" id="btnUnlink">remove link</a></div>`:""}
+    </div>
+    <div style="margin-top:14px"><button class="btn danger" id="btnDelete">Delete job</button></div>`;
+  const on=(s,f)=>{const el=$(s);if(el)el.onclick=f};
+  on("#btnStart",()=>updateDoc(doc(db,"jobs",id),{startedAt:Date.now(),finishedAt:null,status:"In progress"}));
+  on("#btnFinish",()=>{const now=Date.now();updateDoc(doc(db,"jobs",id),{finishedAt:now,durationMins:Math.round((now-j.startedAt)/60000),status:"Completed"})});
+  on("#btnRestart",()=>{if(confirm("Restart the timer from now?"))updateDoc(doc(db,"jobs",id),{startedAt:Date.now(),finishedAt:null,status:"In progress"})});
+  on("#btnMarkPaid",async()=>{let c=j.cost;if(!c){const v=prompt("Amount charged (£)",j.quote||"");if(v===null)return;c=Number(v)||0}await updateDoc(doc(db,"jobs",id),{paid:true,paidAt:Date.now(),status:"Paid",cost:c});toast("Marked as paid")});
+  on("#btnDelete",async()=>{if(!confirm("Delete this job and its photos?"))return;const b=writeBatch(db);photos.forEach(p=>b.delete(doc(db,"jobs",id,"photos",p.id)));b.delete(doc(db,"jobs",id));await b.commit();$("#detailClose").click();toast("Job deleted")});
+  on("#dCust",e=>{e.preventDefault();openCustomer(j.customerId)});
+  on("#btnShare",()=>{const txt=`CK Dentmaster – Job summary\n${vehLabel(j)}${j.reg?" "+fmtReg(j.reg):""} (${j.colour||""})\nCustomer: ${j.customerName}\nDate: ${j.bookedDate?fmtDate(j.bookedDate):"TBC"}${j.bookedTime?" "+j.bookedTime:""}\nWork: ${j.description||""}\nCost: ${money(j.cost||j.quote)}${j.paid?" (Paid)":""}`;if(navigator.share)navigator.share({title:"CK Dentmaster job",text:txt}).catch(()=>{});else{navigator.clipboard.writeText(txt);toast("Copied to clipboard")}});
+  $$("[data-add]").forEach(b=>b.onclick=()=>{$("#photoInput").dataset.type=b.dataset.add;$("#photoInput").click()});
+  $$("[data-del]").forEach(b=>b.onclick=async()=>{if(confirm("Delete this photo?"))await deleteDoc(doc(db,"jobs",id,"photos",b.dataset.del))});
+  $$("[data-full]").forEach(i=>i.onclick=()=>{$("#lightboxImg").src=i.src;$("#lightbox").classList.remove("hidden")});
+  on("#btnPdf",()=>makePdf(j));
+  on("#btnLink",()=>shareLink(j));
+  on("#btnUnlink",async e=>{e.preventDefault();if(!confirm("Remove the public link? Anyone with it will no longer be able to open it."))return;await deleteDoc(doc(db,"public_reports",j.shareToken));await updateDoc(doc(db,"jobs",id),{shareToken:null});toast("Link removed")});
+  clearInterval(timerInt);if(running)timerInt=setInterval(()=>{const d=$("#timerDisp");if(d)d.textContent=fmtClock(Date.now()-j.startedAt)},1000);
+}
+const closeLb=()=>$("#lightbox").classList.add("hidden");
+$("#lightboxClose").onclick=closeLb;$("#lightbox").onclick=e=>{if(e.target.id==="lightbox")closeLb()};
+
+/* ───────── PDF report (jsPDF, generated on the phone) ───────── */
+let logoData=null;
+async function getLogo(){if(logoData)return logoData;const b=await (await fetch("logo.png")).blob();logoData=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(b)});return logoData}
+function imgDims(data){return new Promise(r=>{const i=new Image();i.onload=()=>r([i.width,i.height]);i.onerror=()=>r([4,3]);i.src=data})}
+async function makePdf(j){
+  if(!window.jspdf)return toast("PDF library still loading – try again");
+  toast("Building PDF…");
+  const {jsPDF}=window.jspdf;const pdf=new jsPDF({unit:"mm",format:"a4"});const W=210,M=14;let y=0;
+  const lime=[182,242,26],dark=[20,20,20],grey=[110,110,110];
+  const header=()=>{pdf.setFillColor(...dark);pdf.rect(0,0,W,30,"F");pdf.addImage(logo,"PNG",M,6,46,18);pdf.setTextColor(...lime);pdf.setFont("helvetica","bold");pdf.setFontSize(16);pdf.text("JOB REPORT",W-M,14,{align:"right"});pdf.setTextColor(200,200,200);pdf.setFont("helvetica","normal");pdf.setFontSize(9);pdf.text(`Ref ${j.id.slice(-6).toUpperCase()} · ${new Date().toLocaleDateString("en-GB")}`,W-M,21,{align:"right"});y=40};
+  const footer=()=>{const n=pdf.internal.getNumberOfPages();for(let i=1;i<=n;i++){pdf.setPage(i);pdf.setDrawColor(...lime);pdf.setLineWidth(.6);pdf.line(M,285,W-M,285);pdf.setFontSize(8);pdf.setTextColor(...grey);pdf.text("CK Dentmaster · Paintless dent repair · instagram.com/ckdentmaster",M,290);pdf.text(`Page ${i} of ${n}`,W-M,290,{align:"right"})}};
+  const need=h=>{if(y+h>278){pdf.addPage();header()}};
+  const section=(t,extra=0)=>{need(12+extra);pdf.setFillColor(...lime);pdf.rect(M,y,2.5,6,"F");pdf.setTextColor(...dark);pdf.setFont("helvetica","bold");pdf.setFontSize(11);pdf.text(t.toUpperCase(),M+5,y+4.8);y+=10};
+  const kv=(rows)=>{pdf.setFontSize(10);rows.forEach(([k,v])=>{if(!v)return;const lines=pdf.splitTextToSize(String(v),W-M*2-38);need(lines.length*5+2);pdf.setFont("helvetica","normal");pdf.setTextColor(...grey);pdf.text(k,M,y+4);pdf.setTextColor(30,30,30);pdf.setFont("helvetica","bold");pdf.text(lines,M+38,y+4);y+=lines.length*5+2});y+=3};
+  const logo=await getLogo();header();
+  // title
+  pdf.setTextColor(...dark);pdf.setFont("helvetica","bold");pdf.setFontSize(20);pdf.text(`${vehLabel(j)}${j.reg?"  "+fmtReg(j.reg):""}`,M,y+2);
+  pdf.setFontSize(10);pdf.setFont("helvetica","normal");pdf.setTextColor(...grey);pdf.text([j.colour,j.year,j.status].filter(Boolean).join("  ·  "),M,y+9);y+=18;
+  section("Customer");kv([["Name",j.customerName],["Phone",j.customerPhone],["Address",[j.customerAddress,j.postcode].filter(Boolean).join(", ")],["Location",[j.location,j.locationNote].filter(Boolean).join(" — ")]]);
+  section("Booking");const dur=j.startedAt&&j.finishedAt?fmtDur(j.finishedAt-j.startedAt):"";kv([["Date",j.bookedDate?fmtDate(j.bookedDate)+(j.bookedTime?" at "+j.bookedTime:""):"—"],["Started",j.startedAt?new Date(j.startedAt).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):""],["Finished",j.finishedAt?new Date(j.finishedAt).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):""],["Time on job",dur]]);
+  section("Work carried out");kv([["Panels",(j.panels||[]).join(", ")],["Description",j.description||"—"]]);
+  const photosOf=t=>photos.filter(p=>p.type===t);
+  const gridPdf=async(arr)=>{const cw=(W-M*2-6)/3;let col=0;for(const p of arr){const[iw,ih]=await imgDims(p.data);let w=cw,h=cw*ih/iw;if(h>cw){h=cw;w=cw*iw/ih}if(col===0)need(cw+4);pdf.addImage(p.data,"JPEG",M+col*(cw+3)+(cw-w)/2,y+(cw-h)/2,w,h);col++;if(col===3){col=0;y+=cw+3}}if(col)y+=cw+3;y+=3};
+  const b=photosOf("before"),a=photosOf("after");
+  if(b.length){section(`Before (${b.length})`,62);await gridPdf(b)}
+  if(a.length){section(`After (${a.length})`,62);await gridPdf(a)}
+  section("Cost");kv([["Quoted",j.quote?money(j.quote):""],["Charged",money(j.cost)],["Payment",j.paid?`Paid · ${j.payMethod||""}${j.paidAt?" · "+new Date(j.paidAt).toLocaleDateString("en-GB"):""}`:"Outstanding"]]);
+  need(22);pdf.setFillColor(...dark);pdf.roundedRect(M,y,W-M*2,16,2,2,"F");pdf.setTextColor(...lime);pdf.setFont("helvetica","bold");pdf.setFontSize(13);pdf.text("TOTAL",M+5,y+10.5);pdf.text(money(j.cost),W-M-5,y+10.5,{align:"right"});y+=22;
+  pdf.setFontSize(9);pdf.setTextColor(...grey);pdf.setFont("helvetica","normal");pdf.text("Thank you for choosing CK Dentmaster. Please get in touch if you have any questions about this work.",M,y+4);
+  footer();
+  const name=`CK-Dentmaster-${(j.reg||j.customerName||"job").replace(/\s+/g,"")}-${j.bookedDate||todayStr()}.pdf`;
+  const blob=pdf.output("blob");const file=new File([blob],name,{type:"application/pdf"});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:"CK Dentmaster job report"});return}catch(e){if(e.name==="AbortError")return}}
+  const u=URL.createObjectURL(blob);const aEl=document.createElement("a");aEl.href=u;aEl.download=name;document.body.appendChild(aEl);aEl.click();aEl.remove();setTimeout(()=>URL.revokeObjectURL(u),5000);toast("PDF downloaded");
+}
+
+/* ───────── Public job link (report.html?r=TOKEN) ───────── */
+async function shareLink(j){
+  let token=j.shareToken;
+  { // (re)write the public copy every time so the link always shows the latest photos and cost
+    if(!token)token=[...crypto.getRandomValues(new Uint8Array(12))].map(b=>b.toString(16).padStart(2,"0")).join("");
+    toast(j.shareToken?"Updating link…":"Creating link…");
+    const pub={vehicle:vehLabel(j),reg:j.reg||"",colour:j.colour||"",year:j.year||"",customerName:j.customerName||"",bookedDate:j.bookedDate||"",bookedTime:j.bookedTime||"",status:j.status||"",panels:j.panels||[],description:j.description||"",quote:j.quote||0,cost:j.cost||0,paid:!!j.paid,duration:j.startedAt&&j.finishedAt?fmtDur(j.finishedAt-j.startedAt):"",
+      media:photos.map(p=>({kind:"photo",type:p.type,data:p.data})),createdAt:Date.now()};
+    // keep under Firestore's 1 MB doc limit: drop photos from the end if needed
+    while(JSON.stringify(pub).length>950000&&pub.media.some(m=>m.kind==="photo")){const i=pub.media.map(m=>m.kind).lastIndexOf("photo");pub.media.splice(i,1);pub.truncated=true}
+    await setDoc(doc(db,"public_reports",token),pub);await updateDoc(doc(db,"jobs",j.id),{shareToken:token});
+  }
+  const url=APP_URL+"report.html?r="+token;
+  const text=`CK Dentmaster – job report for your ${vehLabel(j)}${j.reg?" "+fmtReg(j.reg):""}: ${url}`;
+  if(navigator.share){try{await navigator.share({title:"CK Dentmaster job report",text,url});return}catch(e){if(e.name==="AbortError")return}}
+  await navigator.clipboard.writeText(url);toast("Link copied – paste it into WhatsApp");
+}
+
+/* Photos: compress on device, store in Firestore (no Storage bucket needed) */
+$("#photoInput").onchange=async e=>{const files=[...e.target.files];e.target.value="";if(!files.length||!openJobId)return;const type=$("#photoInput").dataset.type||"before";
+  toast(`Adding ${files.length} photo${files.length>1?"s":""}…`);
+  for(const f of files){try{const data=await compress(f);await addDoc(collection(db,"jobs",openJobId,"photos"),{type,data,createdAt:serverTimestamp()})}catch(err){console.error(err);toast("Photo failed: "+err.message)}}
+  updateDoc(doc(db,"jobs",openJobId),{photoCount:photos.length+files.length});
+};
+function compress(file,max=1280,q=.72){return new Promise((res,rej)=>{const img=new Image();const url=URL.createObjectURL(file);img.onload=()=>{let{width:w,height:h}=img;const sc=Math.min(1,max/Math.max(w,h));w=Math.round(w*sc);h=Math.round(h*sc);const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);let out=c.toDataURL("image/jpeg",q);let qq=q;while(out.length>900000&&qq>.3){qq-=.1;out=c.toDataURL("image/jpeg",qq)}URL.revokeObjectURL(url);res(out)};img.onerror=()=>rej(new Error("Could not read image"));img.src=url})}
+
+/* ───────── Stats ───────── */
+$("#statRange").onclick=e=>{const c=e.target.closest(".chip");if(!c)return;statRange=c.dataset.r;$$("#statRange .chip").forEach(x=>x.classList.toggle("active",x===c));renderStats()};
+function renderStats(){
+  const now=new Date(),y=now.getFullYear(),m=now.getMonth();
+  const inRange=d=>{if(!d)return statRange==="all";const dt=new Date(d+"T00:00:00");switch(statRange){case"month":return dt.getFullYear()===y&&dt.getMonth()===m;case"last":{const lm=new Date(y,m-1,1);return dt.getFullYear()===lm.getFullYear()&&dt.getMonth()===lm.getMonth()}case"year":return dt.getFullYear()===y;default:return true}};
+  const js=jobs.filter(j=>j.status!=="Cancelled"&&inRange(j.bookedDate));
+  const done=js.filter(j=>["Completed","Invoiced","Paid"].includes(j.status));
+  const revenue=js.reduce((s,j)=>s+(Number(j.cost)||0),0),paidSum=js.filter(j=>j.paid).reduce((s,j)=>s+(Number(j.cost)||0),0);
+  const timed=done.filter(j=>j.startedAt&&j.finishedAt);const avg=timed.length?timed.reduce((s,j)=>s+(j.finishedAt-j.startedAt),0)/timed.length:0;
+  const outstanding=jobs.filter(j=>!j.paid&&["Completed","Invoiced"].includes(j.status)).reduce((s,j)=>s+(Number(j.cost)||Number(j.quote)||0),0);
+  $("#statGrid").innerHTML=[["Jobs",js.length],["Completed",done.length],["Charged",money(revenue)],["Paid",money(paidSum)],["Outstanding (all)",money(outstanding)],["Avg time / job",avg?fmtDur(avg):"—"],["Avg £ / job",done.length?money(revenue/Math.max(done.length,1)):"—"],["Booked ahead",jobs.filter(j=>j.bookedDate>todayStr()&&j.status==="Booked").length]].map(([k,v])=>`<div class="stat"><div class="v">${v}</div><div class="k">${k}</div></div>`).join("");
+  const mk={};js.forEach(j=>{const k=j.make||"Unknown";mk[k]=mk[k]||{n:0,v:0};mk[k].n++;mk[k].v+=Number(j.cost)||0});
+  const rows=Object.entries(mk).sort((a,b)=>b[1].n-a[1].n);
+  $("#statMakes").innerHTML=rows.length?rows.map(([k,v])=>`<div class="card spread" style="padding:11px 14px"><span style="font-weight:600">${esc(k)}</span><span class="small muted">${v.n} job${v.n===1?"":"s"} · <b style="color:var(--text)">${money(v.v)}</b></span></div>`).join(""):'<div class="muted small">No data yet.</div>';
+}
+
+/* ───────── PWA ───────── */
+if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body>
+</html>

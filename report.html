@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CK Dentmaster – Job report</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0a;--card:#1b1b1b;--line:#2c2c2c;--text:#f2f2f2;--muted:#9a9a9a;--lime:#b6f21a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:'Barlow',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 60px}
+header{display:flex;align-items:center;justify-content:space-between;padding:8px 0 16px;border-bottom:1px solid var(--line);margin-bottom:16px}
+header img{height:40px}header span{color:var(--lime);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:13px}
+h1{font-size:26px;margin:0}.sub{color:var(--muted);margin:4px 0 16px}
+.plate{display:inline-block;background:#f7e04d;color:#111;font-weight:700;letter-spacing:.1em;padding:3px 9px;border-radius:6px;font-size:15px;vertical-align:middle;margin-left:8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.section{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin:18px 0 8px}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:6px 10px;font-size:15px;margin:0}.kv dt{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em;padding-top:3px}.kv dd{margin:0}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.grid img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;border:1px solid var(--line);display:block;background:#000}
+.total{display:flex;justify-content:space-between;align-items:center;background:#182106;border:1px solid #2d3f0a;border-radius:14px;padding:16px;font-weight:700;font-size:20px;color:var(--lime)}
+.badge{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;background:#143d1e;color:#5ee07a}
+.badge.out{background:#3a2d10;color:#ffb340}
+.btn{display:block;width:100%;margin-top:14px;padding:13px;border-radius:12px;background:var(--lime);color:#0a0a0a;font-weight:700;text-transform:uppercase;letter-spacing:.04em;text-align:center;text-decoration:none;border:0;font-size:15px;font-family:inherit;cursor:pointer}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
+footer{color:var(--muted);font-size:13px;text-align:center;margin-top:30px}footer a{color:var(--lime)}
+.empty{text-align:center;color:var(--muted);padding:60px 20px}
+#lb{position:fixed;inset:0;background:rgba(0,0,0,.96);display:none;align-items:center;justify-content:center;z-index:9}#lb img{max-width:100%;max-height:100%}
+@media print{body{background:#fff;color:#111}.card,.total{border-color:#ddd;background:#fff}.btn{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><img src="logo.png" alt="CK Dentmaster"><span>Job report</span></header>
+  <div id="body" class="empty">Loading…</div>
+  <footer>CK Dentmaster · Paintless dent repair · <a href="https://www.instagram.com/ckdentmaster/">@ckdentmaster</a></footer>
+</div>
+<div id="lb" onclick="this.style.display='none'"><img id="lbImg" alt=""></div>
+<script src="firebase-config.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money=n=>"£"+(Number(n)||0).toLocaleString("en-GB",{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtDate=s=>{if(!s)return"";return new Date(s+"T00:00:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short",year:"numeric"})};
+const fmtReg=r=>{r=(r||"").toUpperCase().replace(/[^A-Z0-9]/g,"");return /^[A-Z]{2}\d{2}[A-Z]{3}$/.test(r)?r.slice(0,4)+" "+r.slice(4):r};
+const token=new URLSearchParams(location.search).get("r");
+const el=document.getElementById("body");
+(async()=>{
+  try{
+    if(!token)throw new Error("No report in this link.");
+    const app=initializeApp(window.CK_FIREBASE_CONFIG);const db=getFirestore(app);
+    const s=await getDoc(doc(db,"public_reports",token));
+    if(!s.exists())throw new Error("This report link has expired or been removed.");
+    const j=s.data();
+    const media=t=>(j.media||[]).filter(m=>m.type===t);
+    const grid=arr=>`<div class="grid">${arr.map(m=>`<img src="${m.data}" alt="" onclick="lbImg.src=this.src;lb.style.display='flex'">`).join("")}</div>`;
+    const b=media("before"),a=media("after");
+    el.className="";
+    el.innerHTML=`<h1>${esc(j.vehicle)}${j.reg?`<span class="plate">${esc(fmtReg(j.reg))}</span>`:""}</h1>
+      <div class="sub">${esc([j.colour,j.year].filter(Boolean).join(" · "))}${j.customerName?" · for "+esc(j.customerName):""}</div>
+      <div class="card"><dl class="kv"><dt>Date</dt><dd>${j.bookedDate?fmtDate(j.bookedDate)+(j.bookedTime?" at "+esc(j.bookedTime):""):"—"}</dd>${j.duration?`<dt>Time on job</dt><dd>${esc(j.duration)}</dd>`:""}<dt>Status</dt><dd>${esc(j.status)}</dd></dl></div>
+      <div class="section">Work carried out</div>
+      <div class="card">${(j.panels||[]).length?`<div style="color:var(--muted);font-size:13px;margin-bottom:6px">${esc(j.panels.join(" · "))}</div>`:""}<div style="white-space:pre-wrap">${esc(j.description||"—")}</div></div>
+      ${b.length?`<div class="section">Before</div>${grid(b)}`:""}
+      ${a.length?`<div class="section">After</div>${grid(a)}`:""}
+      <div class="section">Cost</div>
+      <div class="total"><span>Total</span><span>${money(j.cost||j.quote)} <span class="badge ${j.paid?"":"out"}">${j.paid?"Paid":"Due"}</span></span></div>
+      <button class="btn ghost" onclick="window.print()">Save / print as PDF</button>`;
+  }catch(e){el.innerHTML=esc(e.message)}
+})();
+</script>
+</body>
+</html>

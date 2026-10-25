@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // The one and only app user (created in Firebase Console → Authentication → Users)
+    function isJay() {
+      return request.auth != null && request.auth.token.email == 'jay@ckdentmaster.app';
+    }
+
+    // Public job reports: anyone with the link can read, only Jay can create/update/delete.
+    match /public_reports/{token} {
+      allow read: if true;
+      allow write: if isJay();
+    }
+
+    // Everything else (jobs, photos, customers, settings) is private to Jay.
+    match /{document=**} {
+      allow read, write: if isJay();
+    }
+  }
+}
