@@ -15,6 +15,8 @@ A mobile job-management app for CK Dentmaster (paintless dent repair). It is an 
 - **Reports tab** – this week / month / last month / year / custom range, by job type; totals plus a landscape PDF report and CSV export, both shareable
 - **Invoicing** – "Finish & invoice" on the job stops the timer, pre-fills an invoice (Auto Capital details or the private customer), and on save creates a numbered invoice PDF in the CK Dentmaster layout plus the job report, shared together. Invoices tab shows issued / paid / outstanding with mark-paid, edit and re-share.
 - Business details, bank details, invoice numbering and the Auto Capital bill-to defaults are under Settings
+- **Record payment** – Mark as paid asks for the date, method (bank transfer / cash / card / other), amount and a reference, on the job or the invoice
+- **Booking confirmation** – one tap on a booked job writes a WhatsApp message with date, time, vehicle and quote plus a link to a confirmation page (add to calendar, call, WhatsApp)
 - Customers list with job history and paid total
 - "Use my current location" on the job form pins GPS to the job (asks for location permission); photos ask for camera permission the first time
 - Stats: jobs, charged, paid, outstanding, average time and £ per job, breakdown by manufacturer
@@ -77,7 +79,7 @@ The CK icon appears on the home screen and the app opens full-screen.
 
 ## Updating the app
 
-Edit `index.html`, bump `CACHE = "ckdm-v7"` in `sw.js`, push to `main`. Phones pick up the new version next time the app opens online.
+Edit `index.html`, bump `CACHE = "ckdm-v8"` in `sw.js`, push to `main`. Phones pick up the new version next time the app opens online.
 
 ## Data model (Firestore)
 

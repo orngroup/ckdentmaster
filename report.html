@@ -61,6 +61,24 @@ const el=document.getElementById("body");
     const s=await getDoc(doc(db,"public_reports",token));
     if(!s.exists())throw new Error("This report link has expired or been removed.");
     const j=s.data();
+    if(j.kind==="booking"){document.title="CK Dentmaster – Booking confirmation";document.querySelector("header span").textContent="Booking confirmed";
+      const d=j.bookedDate?new Date(j.bookedDate+"T"+(j.bookedTime||"09:00")+":00"):null;
+      const ics=d?"data:text/calendar;charset=utf8,"+encodeURIComponent(["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//CK Dentmaster//EN","BEGIN:VEVENT","UID:"+token+"@ckdentmaster","DTSTAMP:"+new Date().toISOString().replace(/[-:]/g,"").slice(0,15)+"Z","DTSTART:"+j.bookedDate.replace(/-/g,"")+"T"+(j.bookedTime||"09:00").replace(":","")+"00","DURATION:PT2H","SUMMARY:CK Dentmaster – "+j.vehicle,"DESCRIPTION:"+(j.description||"").replace(/\n/g," "),"LOCATION:"+(j.address||j.location||""),"END:VEVENT","END:VCALENDAR"].join("\r\n")):"";
+      const wa=j.business?.phone?"https://wa.me/44"+j.business.phone.replace(/\D/g,"").replace(/^0/,""):"";
+      el.className="";
+      el.innerHTML=`<h1>${esc(j.vehicle)}${j.reg?`<span class="plate">${esc(fmtReg(j.reg))}</span>`:""}</h1>
+        <div class="sub">${j.customerName?"Booking for "+esc(j.customerName):""}${j.colour?" · "+esc(j.colour):""}</div>
+        <div class="total" style="flex-direction:column;align-items:flex-start;gap:4px"><span style="font-size:13px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em">Your appointment</span><span>${fmtDate(j.bookedDate)}${j.bookedTime?" at "+esc(j.bookedTime):""}</span></div>
+        <div class="section">Where</div>
+        <div class="card"><div style="font-weight:600">${esc(j.location||"")}</div>${j.address?`<div class="small" style="margin-top:4px">${esc(j.address)}</div>`:""}${j.locationNote?`<div class="small" style="color:var(--muted);margin-top:4px">${esc(j.locationNote)}</div>`:""}</div>
+        <div class="section">Work booked</div>
+        <div class="card">${(j.panels||[]).length?`<div style="color:var(--muted);font-size:13px;margin-bottom:6px">${esc(j.panels.join(" · "))}</div>`:""}<div style="white-space:pre-wrap">${esc(j.description||"Paintless dent repair")}</div>${j.quote?`<div style="margin-top:10px;font-weight:700;color:var(--lime);font-size:18px">Quoted ${money(j.quote)}</div>`:""}</div>
+        <div class="section">On the day</div>
+        <div class="card small">Please make sure the vehicle is accessible and the damaged panel is clean and dry. Most repairs take 1–2 hours. If anything changes, let us know as early as you can.</div>
+        ${ics?`<a class="btn" href="${ics}" download="ck-dentmaster-booking.ics">Add to calendar</a>`:""}
+        ${j.business?.phone?`<a class="btn ghost" href="tel:${esc(j.business.phone)}">Call ${esc(j.business.name||"CK Dentmaster")} · ${esc(j.business.phone)}</a>`:""}
+        ${wa?`<a class="btn ghost" href="${wa}">Message on WhatsApp</a>`:""}`;
+      return}
     const media=t=>(j.media||[]).filter(m=>m.type===t);
     const grid=arr=>`<div class="grid">${arr.map(m=>`<img src="${m.data}" alt="" onclick="lbImg.src=this.src;lb.style.display='flex'">`).join("")}</div>`;
     const b=media("before"),a=media("after");

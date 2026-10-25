@@ -380,6 +380,7 @@ select.input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
         <div class="field"><label>Charged (£)</label><input id="fCost" class="input" inputmode="decimal" placeholder="0.00"></div>
       </div>
       <div class="toggle"><span>Paid</span><button class="sw" id="fPaid" type="button"></button></div>
+      <div class="field" id="fPaidDateWrap" style="display:none"><label>Paid on</label><input id="fPaidDate" class="input" type="date"></div>
       <div class="field"><label>Payment method</label><select id="fPayMethod" class="input"><option>Cash</option><option>Bank transfer</option><option>Card</option><option>Invoice</option><option>Other</option></select></div>
     </div>
   </div>
@@ -460,6 +461,21 @@ select.input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
     <div class="title">Invoice</div><span style="width:40px"></span>
   </div>
   <div class="content" id="invDetailBody"></div>
+</div>
+
+<!-- ───────── MARK AS PAID SHEET ───────── -->
+<div class="sheet" id="paidSheet">
+  <div class="topbar">
+    <button class="iconbtn" id="paidClose"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <div class="title">Record payment</div><span style="width:40px"></span>
+  </div>
+  <div class="content">
+    <div class="card" id="paidSummary"></div>
+    <div class="row"><div class="field"><label>Date paid</label><input id="pDate" class="input" type="date"></div><div class="field"><label>Amount (£)</label><input id="pAmount" class="input" inputmode="decimal"></div></div>
+    <div class="field"><label>Method</label><div class="seg" id="pMethod" style="flex-wrap:wrap"><button type="button" data-m="Bank transfer" class="active">Bank transfer</button><button type="button" data-m="Cash">Cash</button><button type="button" data-m="Card">Card</button><button type="button" data-m="Other">Other</button></div></div>
+    <div class="field"><label>Reference / note</label><input id="pRef" class="input" placeholder="optional – e.g. paid by Keith, ref 1234"></div>
+  </div>
+  <div class="footer"><button class="btn primary" id="paidSave">Save payment</button></div>
 </div>
 
 <!-- ───────── SETTINGS SHEET ───────── -->
@@ -740,7 +756,7 @@ $("#fColour").innerHTML=COLOURS.map(c=>`<option>${c}</option>`).join("");
 $("#fPanels").innerHTML=PANELS.map(p=>`<button type="button" class="chip" data-p="${esc(p)}">${esc(p)}</button>`).join("");
 $("#fPanels").style.flexWrap="wrap";
 $("#fPanels").onclick=e=>{const c=e.target.closest(".chip");if(!c)return;const p=c.dataset.p;panelsSel.has(p)?panelsSel.delete(p):panelsSel.add(p);c.classList.toggle("active",panelsSel.has(p))};
-$("#fPaid").onclick=()=>{paid=!paid;$("#fPaid").classList.toggle("on",paid);if(paid&&$("#fStatus").value!=="Cancelled")$("#fStatus").value="Paid"};
+$("#fPaid").onclick=()=>{paid=!paid;$("#fPaid").classList.toggle("on",paid);$("#fPaidDateWrap").style.display=paid?"":"none";if(paid&&!$("#fPaidDate").value)$("#fPaidDate").value=todayStr();if(paid&&$("#fStatus").value!=="Cancelled")$("#fStatus").value="Paid"};
 $("#fStatus").onchange=()=>{if($("#fStatus").value==="Paid"&&!paid)$("#fPaid").click()};
 $("#fReg").oninput=e=>{e.target.value=fmtReg(e.target.value)};
 let jobType="Private",gps=null;
@@ -753,7 +769,7 @@ $("#fPrices").onclick=e=>{const c=e.target.closest(".chip");if(!c)return;const p
 
 $("#fabAdd").onclick=()=>openEditor(null);
 function openEditor(id,date,cust){
-  editId=id;step=1;panelsSel=new Set();paid=false;$("#fPaid").classList.remove("on");jobType="Private";gps=null;setGpsLabel();$$("#fPrices .chip").forEach(x=>x.classList.remove("active"));
+  editId=id;step=1;panelsSel=new Set();paid=false;$("#fPaid").classList.remove("on");$("#fPaidDateWrap").style.display="none";$("#fPaidDate").value="";jobType="Private";gps=null;setGpsLabel();$$("#fPrices .chip").forEach(x=>x.classList.remove("active"));
   ["fName","fPhone","fEmail","fAddress","fPostcode","fLocationNote","fReg","fMakeOther","fModelOther","fYear","fDesc","fNotes","fTime","fQuote","fCost"].forEach(i=>$("#"+i).value="");
   $("#fCustPick").value="";$("#fLocation").value="Customer's address";$("#fMake").value="";fillModels();$("#fColour").value="White";$("#fStatus").value="Booked";$("#fPayMethod").value="Bank transfer";$("#fDate").value=date||"";
   $("#jobSheetTitle").textContent=id?"Edit job":"New job";
@@ -767,7 +783,7 @@ function openEditor(id,date,cust){
     $("#fColour").value=COLOURS.includes(j.colour)?j.colour:"Other";$("#fYear").value=j.year||"";
     (j.panels||[]).forEach(p=>panelsSel.add(p));$("#fDesc").value=j.description||"";$("#fNotes").value=j.notes||"";
     $("#fDate").value=j.bookedDate||"";$("#fTime").value=j.bookedTime||"";$("#fStatus").value=j.status||"Booked";$("#fQuote").value=j.quote||"";$("#fCost").value=j.cost||"";$("#fPayMethod").value=j.payMethod||"Bank transfer";
-    paid=!!j.paid;$("#fPaid").classList.toggle("on",paid);jobType=j.jobType||"Private";gps=j.gps||null;setGpsLabel();
+    paid=!!j.paid;$("#fPaid").classList.toggle("on",paid);$("#fPaidDateWrap").style.display=paid?"":"none";$("#fPaidDate").value=j.paidAt?ymd(new Date(j.paidAt)):"";jobType=j.jobType||"Private";gps=j.gps||null;setGpsLabel();
   }}
   $$("#fType button").forEach(x=>x.classList.toggle("active",x.dataset.t===jobType));
   $$("#fPanels .chip").forEach(c=>c.classList.toggle("active",panelsSel.has(c.dataset.p)));
@@ -803,7 +819,7 @@ async function saveJob(){
       panels:[...panelsSel],description:$("#fDesc").value.trim(),notes:$("#fNotes").value.trim(),
       bookedDate:$("#fDate").value||"",bookedTime:$("#fTime").value||"",status:$("#fStatus").value,
       quote:Number($("#fQuote").value)||0,cost:Number($("#fCost").value)||0,paid,payMethod:$("#fPayMethod").value,updatedAt:serverTimestamp()};
-    if(paid&&!(editId&&jobs.find(j=>j.id===editId)?.paidAt))data.paidAt=Date.now();
+    if(paid){const pd=$("#fPaidDate").value;data.paidAt=pd?new Date(pd+"T12:00:00").getTime():(jobs.find(j=>j.id===editId)?.paidAt||Date.now())}else{data.paidAt=null}
     const isNew=!editId;
     if(editId)await updateDoc(doc(db,"jobs",editId),data);
     else{const r=await addDoc(collection(db,"jobs"),{...data,createdAt:serverTimestamp(),photoCount:0});editId=r.id}
@@ -837,7 +853,8 @@ function renderDetail(id){const j=jobs.find(x=>x.id===id);if(!j){$("#detailBody"
       ${j.startedAt?`<div class="small muted" style="margin-top:8px">Started ${new Date(j.startedAt).toLocaleString("en-GB",{weekday:"short",hour:"2-digit",minute:"2-digit",day:"numeric",month:"short"})}${j.finishedAt?" · Finished "+new Date(j.finishedAt).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}):""}</div>`:""}</div>`:""}
 
     <div class="section">Booking</div>
-    <div class="card"><dl class="kv"><dt>Date</dt><dd>${j.bookedDate?fmtDate(j.bookedDate):"Not booked"}${j.bookedTime?" at "+esc(j.bookedTime):""}</dd><dt>Location</dt><dd>${esc(j.location||"")}${j.locationNote?" — "+esc(j.locationNote):""}</dd></dl></div>
+    <div class="card"><dl class="kv"><dt>Date</dt><dd>${j.bookedDate?fmtDate(j.bookedDate):"Not booked"}${j.bookedTime?" at "+esc(j.bookedTime):""}</dd><dt>Location</dt><dd>${esc(j.location||"")}${j.locationNote?" — "+esc(j.locationNote):""}</dd></dl>
+      ${j.bookedDate&&j.status!=="Cancelled"?`<button class="btn" style="margin-top:12px" id="btnConfirm"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${j.confirmToken?"Re-send booking confirmation":"Send booking confirmation"}</button>${j.confirmSentAt?`<div class="small muted" style="margin-top:6px">Confirmation sent ${new Date(j.confirmSentAt).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</div>`:""}`:""}</div>
 
     <div class="section">Customer</div>
     <div class="card"><div style="font-weight:700;font-size:17px">${esc(j.customerName||"")}</div><div class="small muted">${esc(addr||"")}</div>
@@ -853,7 +870,7 @@ function renderDetail(id){const j=jobs.find(x=>x.id===id);if(!j){$("#detailBody"
     <div class="section">After photos (${after.length})</div>${grid(after,"after")}
 
     <div class="section">Cost</div>
-    <div class="card"><dl class="kv"><dt>Quoted</dt><dd>${money(j.quote)}</dd><dt>Charged</dt><dd style="color:var(--lime);font-weight:700;font-size:18px">${money(j.cost)}</dd><dt>Payment</dt><dd>${j.paid?`Paid · ${esc(j.payMethod||"")}${j.paidAt?" · "+new Date(j.paidAt).toLocaleDateString("en-GB"):""}`:"Outstanding"}</dd></dl>
+    <div class="card"><dl class="kv"><dt>Quoted</dt><dd>${money(j.quote)}</dd><dt>Charged</dt><dd style="color:var(--lime);font-weight:700;font-size:18px">${money(j.cost)}</dd><dt>Payment</dt><dd>${j.paid?`Paid · ${esc(j.payMethod||"")}${j.paidAt?" · "+new Date(j.paidAt).toLocaleDateString("en-GB"):""}${j.payRef?`<div class="small muted">${esc(j.payRef)}</div>`:""}`:"Outstanding"}</dd></dl>
       ${!j.paid&&j.status!=="Cancelled"?`<button class="btn primary" style="margin-top:12px" id="btnMarkPaid">Mark as paid</button>`:""}</div>
 
     <div class="section">Invoice</div>
@@ -878,7 +895,8 @@ function renderDetail(id){const j=jobs.find(x=>x.id===id);if(!j){$("#detailBody"
   on("#btnInvOpen",()=>openInvDetail(inv.id));
   on("#btnInvPdf",()=>makeInvoicePdf(inv,true));
   on("#btnRestart",()=>{if(confirm("Restart the timer from now?"))updateDoc(doc(db,"jobs",id),{startedAt:Date.now(),finishedAt:null,status:"In progress"})});
-  on("#btnMarkPaid",async()=>{let c=j.cost;if(!c){const v=prompt("Amount charged (£)",j.quote||"");if(v===null)return;c=Number(v)||0}await updateDoc(doc(db,"jobs",id),{paid:true,paidAt:Date.now(),status:"Paid",cost:c});toast("Marked as paid")});
+  on("#btnMarkPaid",()=>openPaidSheet({jobId:id,invoiceId:inv?.id,amount:j.cost||j.quote||0,label:`${vehLabel(j)}${j.reg?" "+fmtReg(j.reg):""} · ${j.customerName||""}`}));
+  on("#btnConfirm",()=>shareBookingConfirmation(j));
   on("#btnDelete",async()=>{if(!confirm("Delete this job and its photos?"))return;const b=writeBatch(db);photos.forEach(p=>b.delete(doc(db,"jobs",id,"photos",p.id)));b.delete(doc(db,"jobs",id));await b.commit();$("#detailClose").click();toast("Job deleted")});
   on("#dCust",e=>{e.preventDefault();openCustomer(j.customerId)});
   on("#btnShare",()=>{const txt=`CK Dentmaster – Job summary\n${vehLabel(j)}${j.reg?" "+fmtReg(j.reg):""} (${j.colour||""})\nCustomer: ${j.customerName}\nDate: ${j.bookedDate?fmtDate(j.bookedDate):"TBC"}${j.bookedTime?" "+j.bookedTime:""}\nWork: ${j.description||""}\nCost: ${money(j.cost||j.quote)}${j.paid?" (Paid)":""}`;if(navigator.share)navigator.share({title:"CK Dentmaster job",text:txt}).catch(()=>{});else{navigator.clipboard.writeText(txt);toast("Copied to clipboard")}});
@@ -930,6 +948,36 @@ async function makePdf(j,returnBlob){
 }
 
 /* ───────── Public job link (report.html?r=TOKEN) ───────── */
+/* ───────── Record payment sheet ───────── */
+let paidCtx=null,paidMethod="Bank transfer";
+function openPaidSheet(ctx){paidCtx=ctx;paidMethod="Bank transfer";$$("#pMethod button").forEach(b=>b.classList.toggle("active",b.dataset.m===paidMethod));
+  $("#paidSummary").innerHTML=`<div style="font-weight:700">${esc(ctx.label)}</div><div class="small muted">Record when and how this was paid</div>`;
+  $("#pDate").value=todayStr();$("#pAmount").value=ctx.amount||"";$("#pRef").value="";openSheet("#paidSheet")}
+$("#pMethod").onclick=e=>{const b=e.target.closest("button");if(!b)return;paidMethod=b.dataset.m;$$("#pMethod button").forEach(x=>x.classList.toggle("active",x===b))};
+$("#paidClose").onclick=()=>closeSheet("#paidSheet");
+$("#paidSave").onclick=async()=>{const c=paidCtx;if(!c)return;const d=$("#pDate").value||todayStr(),amt=Number($("#pAmount").value)||0,ref=$("#pRef").value.trim();
+  const ts=new Date(d+"T12:00:00").getTime();
+  try{
+    if(c.jobId)await updateDoc(doc(db,"jobs",c.jobId),{paid:true,paidAt:ts,status:"Paid",cost:amt,payMethod:paidMethod,payRef:ref});
+    if(c.invoiceId)await updateDoc(doc(db,"invoices",c.invoiceId),{paid:true,paidDate:d,payMethod:paidMethod==="Bank transfer"?"Bank Transfer":paidMethod,payRef:ref});
+    closeSheet("#paidSheet");toast(`Paid ${money(amt)} by ${paidMethod.toLowerCase()} on ${new Date(ts).toLocaleDateString("en-GB")}`)}
+  catch(e){toast("Could not save: "+e.message)}};
+
+/* ───────── Booking confirmation link ───────── */
+async function shareBookingConfirmation(j){
+  let token=j.confirmToken||[...crypto.getRandomValues(new Uint8Array(12))].map(b=>b.toString(16).padStart(2,"0")).join("");
+  toast("Preparing confirmation…");
+  const pub={kind:"booking",vehicle:vehLabel(j),reg:j.reg||"",colour:j.colour||"",customerName:j.customerName||"",bookedDate:j.bookedDate||"",bookedTime:j.bookedTime||"",location:j.location||"",locationNote:j.locationNote||"",
+    address:j.location==="Customer's address"?[j.customerAddress,j.postcode].filter(Boolean).join(", "):"",panels:j.panels||[],description:j.description||"",quote:j.quote||j.cost||0,
+    business:{name:biz.name,phone:biz.phone,email:biz.email},createdAt:Date.now()};
+  await setDoc(doc(db,"public_reports",token),pub);await updateDoc(doc(db,"jobs",j.id),{confirmToken:token,confirmSentAt:Date.now()});
+  const url=APP_URL+"report.html?r="+token;const first=(j.customerName||"").split(" ")[0];
+  const when=`${fmtDate(j.bookedDate)}${j.bookedTime?" at "+j.bookedTime:""}`;
+  const text=`Hi ${first}, this is ${biz.name}. Your booking is confirmed for ${when} – ${vehLabel(j)}${j.reg?" "+fmtReg(j.reg):""}${pub.quote?`, quoted ${money(pub.quote)}`:""}. Full details here: ${url}\nAny questions, call ${biz.phone}. Thanks!`;
+  if(navigator.share){try{await navigator.share({title:"Booking confirmation",text});return}catch(e){if(e.name==="AbortError")return}}
+  await navigator.clipboard.writeText(text);toast("Message copied – paste it into WhatsApp");
+}
+
 async function shareLink(j){
   let token=j.shareToken;
   { // (re)write the public copy every time so the link always shows the latest photos and cost
@@ -1097,7 +1145,7 @@ function renderInvDetail(id){const i=invoices.find(x=>x.id===id);if(!i){$("#invD
   on("#invJob",()=>{closeSheet("#invDetailSheet");openInvId=null;openDetail(i.jobId)});
   on("#invPdfBtn",async()=>{const ph=await jobPhotos(i.jobId);await makeInvoicePdf(i,true,ph)});
   on("#invBothBtn",()=>{const j=jobs.find(x=>x.id===i.jobId);if(!j)return toast("Job no longer exists");shareInvoiceAndReport(i,j)});
-  on("#invMarkPaid",async()=>{const d=todayStr();await updateDoc(doc(db,"invoices",id),{paid:true,paidDate:d,payMethod:"Bank Transfer"});if(jobs.find(x=>x.id===i.jobId))await updateDoc(doc(db,"jobs",i.jobId),{paid:true,paidAt:Date.now(),status:"Paid",payMethod:"Bank transfer"});toast("Marked as paid")});
+  on("#invMarkPaid",()=>openPaidSheet({jobId:jobs.find(x=>x.id===i.jobId)?i.jobId:null,invoiceId:id,amount:i.total,label:`${i.number} · ${i.billTo?.company||i.billTo?.name||""}`}));
   on("#invUnpaid",async()=>{await updateDoc(doc(db,"invoices",id),{paid:false,paidDate:"",payMethod:""});if(jobs.find(x=>x.id===i.jobId))await updateDoc(doc(db,"jobs",i.jobId),{paid:false,paidAt:null,status:"Invoiced"});toast("Marked as unpaid")});
   on("#invEdit",()=>{closeSheet("#invDetailSheet");openInvId=null;openInvoiceEditor(i.jobId,i)});
   on("#invDelete",async()=>{if(!confirm("Delete "+i.number+"? The job stays."))return;await deleteDoc(doc(db,"invoices",id));if(jobs.find(x=>x.id===i.jobId))await updateDoc(doc(db,"jobs",i.jobId),{invoiceId:null,invoiceNumber:null});closeSheet("#invDetailSheet");openInvId=null;toast("Invoice deleted")});
