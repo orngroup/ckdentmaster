@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
 <title>CK Dentmaster – Jobs</title>
+<meta name="description" content="CK Dentmaster job manager – book, track and report paintless dent repair jobs with before and after photos, timing and costs.">
 <meta name="theme-color" content="#0a0a0a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -40,8 +41,8 @@ a{color:var(--lime)}
 .topbar img{height:34px}
 .topbar .title{font-weight:700;font-size:17px;text-transform:uppercase;letter-spacing:.05em}
 .content{flex:1;padding:14px 14px calc(92px + var(--safe-b))}
-.bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(14,14,14,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:6px 0 calc(6px + var(--safe-b))}
-.bottomnav button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(14,14,14,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:6px 0 calc(6px + var(--safe-b))}
+.bottomnav button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
 .bottomnav button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .bottomnav button.active{color:var(--lime)}
 
@@ -75,6 +76,9 @@ select.input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 .muted{color:var(--muted)}
 .small{font-size:13px}
 .spread{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.seg{display:flex;background:var(--bg2);border:1px solid var(--line);border-radius:11px;padding:4px;gap:4px}.seg button{flex:1;padding:10px;border-radius:8px;font-weight:700;color:var(--muted)}.seg button.active{background:var(--lime);color:#0a0a0a}
+.t-ac{background:#1b2a3f;color:#7fb8ff}.t-pr{background:#2a2a2a;color:#ddd}
+.pricerow{display:grid;grid-template-columns:1fr 110px 36px;gap:8px;margin-bottom:8px;align-items:center}
 .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
 .chip{flex:0 0 auto;padding:8px 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-weight:600;font-size:13px;color:var(--muted);white-space:nowrap}
@@ -191,6 +195,7 @@ select.input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
     <img src="logo.png" alt="CK Dentmaster">
     <div style="display:flex;gap:8px;align-items:center">
       <span id="syncDot" title="Online" style="width:9px;height:9px;border-radius:50%;background:var(--lime);display:inline-block"></span>
+      <button class="iconbtn" id="btnSettings" title="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
       <button class="iconbtn" id="btnSignOut" title="Sign out"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
     </div>
   </div>
@@ -199,6 +204,11 @@ select.input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
     <!-- JOBS -->
     <div id="view-jobs">
       <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input id="jobSearch" class="input" placeholder="Search reg, name, car, postcode…"></div>
+      <div class="chips" id="typeFilters">
+        <button class="chip active" data-t="all">All jobs</button>
+        <button class="chip" data-t="Auto Capital">Auto Capital</button>
+        <button class="chip" data-t="Private">Private</button>
+      </div>
       <div class="chips" id="jobFilters">
         <button class="chip active" data-f="open">Open</button>
         <button class="chip" data-f="today">Today</button>
@@ -228,6 +238,30 @@ select.input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
       <div id="custList"></div>
     </div>
 
+    <!-- REPORTS -->
+    <div id="view-reports" class="hidden">
+      <div class="chips" id="repType">
+        <button class="chip active" data-t="all">All jobs</button>
+        <button class="chip" data-t="Auto Capital">Auto Capital</button>
+        <button class="chip" data-t="Private">Private</button>
+      </div>
+      <div class="chips" id="repRange">
+        <button class="chip" data-r="week">This week</button>
+        <button class="chip active" data-r="month">This month</button>
+        <button class="chip" data-r="last">Last month</button>
+        <button class="chip" data-r="year">This year</button>
+        <button class="chip" data-r="custom">Custom</button>
+      </div>
+      <div class="row hidden" id="repCustom">
+        <div class="field"><label>From</label><input id="repFrom" class="input" type="date"></div>
+        <div class="field"><label>To</label><input id="repTo" class="input" type="date"></div>
+      </div>
+      <div class="stats" id="repGrid"></div>
+      <div style="display:flex;gap:10px;margin:4px 0 14px"><button class="btn primary" id="repPdf">PDF report</button><button class="btn" id="repCsv">Export CSV</button></div>
+      <div class="section" id="repTitle">Jobs</div>
+      <div id="repList"></div>
+    </div>
+
     <!-- STATS -->
     <div id="view-stats" class="hidden">
       <div class="chips" id="statRange">
@@ -248,6 +282,7 @@ select.input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
     <button data-v="jobs" class="active"><svg viewBox="0 0 24 24"><path d="M3 7h18v13H3zM8 7V4h8v3"/></svg>Jobs</button>
     <button data-v="calendar"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Calendar</button>
     <button data-v="customers"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Customers</button>
+    <button data-v="reports"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h5"/></svg>Reports</button>
     <button data-v="stats"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Stats</button>
   </nav>
 </div>
@@ -264,7 +299,8 @@ select.input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 
     <!-- Step 1 Customer -->
     <div class="step" data-step="1">
-      <div class="section">1 · Customer</div>
+      <div class="section">1 · Job type &amp; customer</div>
+      <div class="field"><label>Job type</label><div class="seg" id="fType"><button type="button" data-t="Auto Capital">Auto Capital</button><button type="button" data-t="Private" class="active">Private</button></div></div>
       <div class="field"><label>Existing customer</label>
         <select id="fCustPick" class="input"><option value="">— New customer —</option></select></div>
       <div class="field"><label>Name</label><input id="fName" class="input" placeholder="Customer name" autocomplete="off"></div>
@@ -278,6 +314,7 @@ select.input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
         <div class="field"><label>Job location</label><select id="fLocation" class="input"><option>Customer's address</option><option>Workplace</option><option>Dealership</option><option>Workshop</option><option>Other</option></select></div>
       </div>
       <div class="field"><label>Location notes</label><input id="fLocationNote" class="input" placeholder="Car park level, gate code, etc."></div>
+      <button type="button" class="btn sm" id="fGps"><svg viewBox="0 0 24 24"><path d="M12 22s7-7 7-12a7 7 0 1 0-14 0c0 5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg><span id="fGpsLabel">Use my current location</span></button>
     </div>
 
     <!-- Step 2 Vehicle -->
@@ -312,6 +349,7 @@ select.input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
       </div>
       <div class="field"><label>Status</label><select id="fStatus" class="input">
         <option>Booked</option><option>In progress</option><option>Completed</option><option>Invoiced</option><option>Paid</option><option>Cancelled</option></select></div>
+      <div class="field"><label>Price template <span class="muted" style="text-transform:none;font-weight:500">(tap to fill, then edit if needed)</span></label><div class="chips" id="fPrices"></div></div>
       <div class="row">
         <div class="field"><label>Quoted (£)</label><input id="fQuote" class="input" inputmode="decimal" placeholder="0.00"></div>
         <div class="field"><label>Charged (£)</label><input id="fCost" class="input" inputmode="decimal" placeholder="0.00"></div>
@@ -361,6 +399,25 @@ select.input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
     <button class="btn danger" id="custDelete">Delete customer</button>
   </div>
   <div class="footer"><button class="btn primary" id="custSave">Save</button></div>
+</div>
+
+<!-- ───────── SETTINGS SHEET ───────── -->
+<div class="sheet" id="settingsSheet">
+  <div class="topbar">
+    <button class="iconbtn" id="settingsClose"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <div class="title">Settings</div><span style="width:40px"></span>
+  </div>
+  <div class="content">
+    <div class="section">Price templates</div>
+    <div class="small muted" style="margin-bottom:10px">Tap a template when adding a job to fill the price. Edit the names and amounts here.</div>
+    <div id="priceRows"></div>
+    <button class="btn sm" id="priceAdd" style="margin-top:4px">+ Add template</button>
+    <div class="section">Sample data</div>
+    <button class="btn sm" id="btnSeed">Load sample job (Ajay Kawa – Range Rover)</button>
+    <div class="section">App</div>
+    <div class="small muted">Version 4 · CK Dentmaster job manager</div>
+  </div>
+  <div class="footer"><button class="btn primary" id="priceSave">Save prices</button></div>
 </div>
 
 <div id="lightbox" class="hidden"><img id="lightboxImg" alt=""><button class="iconbtn close" id="lightboxClose"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
@@ -467,8 +524,9 @@ if(!standalone){$("#installCard").classList.remove("hidden");(isIOS?$("#installI
 $("#btnSignOut").onclick=()=>{if(confirm("Sign out?"))signOut(auth)};
 
 /* ───────── State ───────── */
-let jobs=[],customers=[],vehicleExtras={makes:{}};
-let jobFilter="open",statRange="month",calMonth=new Date(),calSel=todayStr();
+let jobs=[],customers=[],vehicleExtras={makes:{}},prices=null;
+const DEFAULT_PRICES=[{name:"Price 1",amount:100},{name:"Price 2",amount:150},{name:"Price 3",amount:200},{name:"Price 4",amount:250}];
+let jobFilter="open",typeFilter="all",statRange="month",calMonth=new Date(),calSel=todayStr(),repRange="month",repType="all";
 let unsub=[];
 
 if(configured)onAuthStateChanged(auth,u=>{
@@ -478,6 +536,7 @@ if(configured)onAuthStateChanged(auth,u=>{
     unsub.push(onSnapshot(query(collection(db,"jobs"),orderBy("bookedDate","asc")),s=>{jobs=s.docs.map(d=>({id:d.id,...d.data()}));renderAll()}));
     unsub.push(onSnapshot(query(collection(db,"customers"),orderBy("name","asc")),s=>{customers=s.docs.map(d=>({id:d.id,...d.data()}));renderCustomers();fillCustPick()}));
     unsub.push(onSnapshot(doc(db,"settings","vehicles"),s=>{vehicleExtras=s.exists()?s.data():{makes:{}};fillMakes()}));
+    unsub.push(onSnapshot(doc(db,"settings","pricing"),s=>{prices=s.exists()?(s.data().items||DEFAULT_PRICES):DEFAULT_PRICES;renderPriceChips()}));
   }else{$("#authScreen").classList.remove("hidden");$("#app").classList.add("hidden")}
 });
 
@@ -485,20 +544,22 @@ if(configured)onAuthStateChanged(auth,u=>{
 $$(".bottomnav button").forEach(b=>b.onclick=()=>showView(b.dataset.v));
 function showView(v){
   $$(".bottomnav button").forEach(b=>b.classList.toggle("active",b.dataset.v===v));
-  ["jobs","calendar","customers","stats"].forEach(x=>$("#view-"+x).classList.toggle("hidden",x!==v));
-  $("#fabAdd").classList.toggle("hidden",v==="stats");
-  if(v==="calendar")renderCalendar(); if(v==="stats")renderStats();
+  ["jobs","calendar","customers","reports","stats"].forEach(x=>$("#view-"+x).classList.toggle("hidden",x!==v));
+  $("#fabAdd").classList.toggle("hidden",v==="stats"||v==="reports");
+  if(v==="calendar")renderCalendar(); if(v==="stats")renderStats(); if(v==="reports")renderReports();
   window.scrollTo(0,0);
 }
-function renderAll(){renderJobs();if(!$("#view-calendar").classList.contains("hidden"))renderCalendar();if(!$("#view-stats").classList.contains("hidden"))renderStats();if(!$("#view-customers").classList.contains("hidden"))renderCustomers();if(openJobId)renderDetail(openJobId)}
+function renderAll(){renderJobs();if(!$("#view-reports").classList.contains("hidden"))renderReports();if(!$("#view-calendar").classList.contains("hidden"))renderCalendar();if(!$("#view-stats").classList.contains("hidden"))renderStats();if(!$("#view-customers").classList.contains("hidden"))renderCustomers();if(openJobId)renderDetail(openJobId)}
 
 /* ───────── Jobs list ───────── */
 $("#jobFilters").onclick=e=>{const c=e.target.closest(".chip");if(!c)return;jobFilter=c.dataset.f;$$("#jobFilters .chip").forEach(x=>x.classList.toggle("active",x===c));renderJobs()};
 $("#jobSearch").oninput=renderJobs;
+$("#typeFilters").onclick=e=>{const c=e.target.closest(".chip");if(!c)return;typeFilter=c.dataset.t;$$("#typeFilters .chip").forEach(x=>x.classList.toggle("active",x===c));renderJobs()};
 function weekRange(){const d=new Date();const day=(d.getDay()+6)%7;const mon=new Date(d);mon.setDate(d.getDate()-day);const sun=new Date(mon);sun.setDate(mon.getDate()+6);return[ymd(mon),ymd(sun)]}
 function filteredJobs(){
   const q=$("#jobSearch").value.trim().toLowerCase(),t=todayStr(),[ws,we]=weekRange();
   return jobs.filter(j=>{
+    if(typeFilter!=="all"&&(j.jobType||"Private")!==typeFilter)return false;
     if(q){const hay=[j.reg,j.customerName,j.make,j.model,j.colour,j.postcode,j.description].join(" ").toLowerCase();if(!hay.includes(q))return false}
     switch(jobFilter){
       case"open":return!["Paid","Cancelled"].includes(j.status);
@@ -515,14 +576,14 @@ function filteredJobs(){
 function jobCard(j){
   const cost=j.cost?money(j.cost):(j.quote?`<span class="muted">Q </span>${money(j.quote)}`:"");
   return`<div class="card tap jobcard" data-id="${j.id}">
-    <div class="spread"><div class="veh">${esc(vehLabel(j))}${j.reg?`<span class="plate">${esc(fmtReg(j.reg))}</span>`:""}</div><span class="badge ${STATUS_CLASS[j.status]||""}">${esc(j.status||"")}</span></div>
+    <div class="spread"><div class="veh">${esc(vehLabel(j))}${j.reg?`<span class="plate">${esc(fmtReg(j.reg))}</span>`:""}</div><span><span class="badge ${j.jobType==="Auto Capital"?"t-ac":"t-pr"}">${j.jobType==="Auto Capital"?"AC":"Private"}</span> <span class="badge ${STATUS_CLASS[j.status]||""}">${esc(j.status||"")}</span></span></div>
     <div class="meta">${esc(j.colour||"")}${j.colour&&j.customerName?" · ":""}${esc(j.customerName||"")}${j.postcode?" · "+esc(j.postcode):""}</div>
     <div class="spread" style="margin-top:8px"><div class="small muted">${j.bookedDate?fmtDate(j.bookedDate):"<i>Not booked</i>"}${j.bookedTime?" · "+esc(j.bookedTime):""}</div><div class="cost">${cost}${j.paid?' <span class="badge s-paid">Paid</span>':""}</div></div>
   </div>`;
 }
 function renderJobs(){
   const list=filteredJobs();
-  $("#jobList").innerHTML=list.length?list.map(jobCard).join(""):`<div class="empty"><svg viewBox="0 0 24 24"><path d="M3 7h18v13H3zM8 7V4h8v3"/></svg><div>No jobs here yet.<br>Tap + to add one.</div></div>`;
+  $("#jobList").innerHTML=list.length?list.map(jobCard).join(""):`<div class="empty"><svg viewBox="0 0 24 24"><path d="M3 7h18v13H3zM8 7V4h8v3"/></svg><div>No jobs here yet.<br>Tap + to add one, or load the sample job from Settings (gear icon).</div></div>`;
 }
 document.body.addEventListener("click",e=>{const c=e.target.closest(".jobcard");if(c)openDetail(c.dataset.id)});
 
@@ -601,10 +662,17 @@ $("#fPanels").onclick=e=>{const c=e.target.closest(".chip");if(!c)return;const p
 $("#fPaid").onclick=()=>{paid=!paid;$("#fPaid").classList.toggle("on",paid);if(paid&&$("#fStatus").value!=="Cancelled")$("#fStatus").value="Paid"};
 $("#fStatus").onchange=()=>{if($("#fStatus").value==="Paid"&&!paid)$("#fPaid").click()};
 $("#fReg").oninput=e=>{e.target.value=fmtReg(e.target.value)};
+let jobType="Private",gps=null;
+$("#fType").onclick=e=>{const b=e.target.closest("button");if(!b)return;jobType=b.dataset.t;$$("#fType button").forEach(x=>x.classList.toggle("active",x===b))};
+function setGpsLabel(){$("#fGpsLabel").textContent=gps?`Location pinned (${gps.lat.toFixed(4)}, ${gps.lng.toFixed(4)}) – tap to clear`:"Use my current location"}
+$("#fGps").onclick=()=>{if(gps){gps=null;setGpsLabel();return}if(!navigator.geolocation)return toast("Location not available on this device");$("#fGpsLabel").textContent="Finding location…";
+  navigator.geolocation.getCurrentPosition(p=>{gps={lat:p.coords.latitude,lng:p.coords.longitude};setGpsLabel();toast("Location pinned")},err=>{setGpsLabel();toast(err.code===1?"Location permission denied – allow it in phone settings":"Could not get location")},{enableHighAccuracy:true,timeout:12000})};
+function renderPriceChips(){const el=$("#fPrices");if(!el)return;el.innerHTML=(prices||DEFAULT_PRICES).map((p,i)=>`<button type="button" class="chip" data-i="${i}">${esc(p.name)} · ${money(p.amount)}</button>`).join("")}
+$("#fPrices").onclick=e=>{const c=e.target.closest(".chip");if(!c)return;const p=(prices||DEFAULT_PRICES)[c.dataset.i];if(!p)return;$("#fQuote").value=p.amount;if(!$("#fCost").value||$$("#fPrices .chip.active").length)$("#fCost").value=p.amount;$$("#fPrices .chip").forEach(x=>x.classList.toggle("active",x===c))};
 
 $("#fabAdd").onclick=()=>openEditor(null);
 function openEditor(id,date,cust){
-  editId=id;step=1;panelsSel=new Set();paid=false;$("#fPaid").classList.remove("on");
+  editId=id;step=1;panelsSel=new Set();paid=false;$("#fPaid").classList.remove("on");jobType="Private";gps=null;setGpsLabel();$$("#fPrices .chip").forEach(x=>x.classList.remove("active"));
   ["fName","fPhone","fEmail","fAddress","fPostcode","fLocationNote","fReg","fMakeOther","fModelOther","fYear","fDesc","fNotes","fTime","fQuote","fCost"].forEach(i=>$("#"+i).value="");
   $("#fCustPick").value="";$("#fLocation").value="Customer's address";$("#fMake").value="";fillModels();$("#fColour").value="White";$("#fStatus").value="Booked";$("#fPayMethod").value="Bank transfer";$("#fDate").value=date||"";
   $("#jobSheetTitle").textContent=id?"Edit job":"New job";
@@ -618,8 +686,9 @@ function openEditor(id,date,cust){
     $("#fColour").value=COLOURS.includes(j.colour)?j.colour:"Other";$("#fYear").value=j.year||"";
     (j.panels||[]).forEach(p=>panelsSel.add(p));$("#fDesc").value=j.description||"";$("#fNotes").value=j.notes||"";
     $("#fDate").value=j.bookedDate||"";$("#fTime").value=j.bookedTime||"";$("#fStatus").value=j.status||"Booked";$("#fQuote").value=j.quote||"";$("#fCost").value=j.cost||"";$("#fPayMethod").value=j.payMethod||"Bank transfer";
-    paid=!!j.paid;$("#fPaid").classList.toggle("on",paid);
+    paid=!!j.paid;$("#fPaid").classList.toggle("on",paid);jobType=j.jobType||"Private";gps=j.gps||null;setGpsLabel();
   }}
+  $$("#fType button").forEach(x=>x.classList.toggle("active",x.dataset.t===jobType));
   $$("#fPanels .chip").forEach(c=>c.classList.toggle("active",panelsSel.has(c.dataset.p)));
   showStep(1);openSheet("#jobSheet");
 }
@@ -647,7 +716,7 @@ async function saveJob(){
     if(customerId){await updateDoc(doc(db,"customers",customerId),cust)}
     else{const existing=customers.find(c=>c.phone&&cust.phone&&c.phone.replace(/\s/g,"")===cust.phone.replace(/\s/g,""));
       if(existing){customerId=existing.id;await updateDoc(doc(db,"customers",customerId),cust)}else{const r=await addDoc(collection(db,"customers"),{...cust,createdAt:serverTimestamp()});customerId=r.id}}
-    const data={customerId,customerName:cust.name,customerPhone:cust.phone,customerEmail:cust.email,customerAddress:cust.address,postcode:cust.postcode,
+    const data={jobType,gps:gps||null,customerId,customerName:cust.name,customerPhone:cust.phone,customerEmail:cust.email,customerAddress:cust.address,postcode:cust.postcode,
       location:$("#fLocation").value,locationNote:$("#fLocationNote").value.trim(),
       reg:fmtReg($("#fReg").value),make,model,colour:$("#fColour").value,year:$("#fYear").value.trim(),
       panels:[...panelsSel],description:$("#fDesc").value.trim(),notes:$("#fNotes").value.trim(),
@@ -679,7 +748,7 @@ function renderDetail(id){const j=jobs.find(x=>x.id===id);if(!j){$("#detailBody"
     <button class="add" data-add="${type}"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Add photo</button></div>`;
   $("#detailBody").innerHTML=`
     <div class="card"><div class="spread"><div><div style="font-size:22px;font-weight:700">${esc(vehLabel(j))}</div><div class="muted">${esc([j.colour,j.year].filter(Boolean).join(" · "))}</div></div>${j.reg?`<span class="plate" style="background:#f7e04d;color:#111;font-weight:700;letter-spacing:.1em;padding:5px 10px;border-radius:6px;font-size:15px">${esc(fmtReg(j.reg))}</span>`:""}</div>
-      <div style="margin-top:10px"><span class="badge ${STATUS_CLASS[j.status]||""}">${esc(j.status)}</span> ${j.paid?'<span class="badge s-paid">Paid</span>':""}</div></div>
+      <div style="margin-top:10px"><span class="badge ${j.jobType==="Auto Capital"?"t-ac":"t-pr"}">${esc(j.jobType||"Private")}</span> <span class="badge ${STATUS_CLASS[j.status]||""}">${esc(j.status)}</span> ${j.paid?'<span class="badge s-paid">Paid</span>':""}</div></div>
 
     ${j.status!=="Cancelled"?`<div class="timerbox"><div class="l">${running?"In progress":dur?"Time on job":"Job timer"}</div><div class="t" id="timerDisp">${running?fmtClock(Date.now()-j.startedAt):dur?fmtDur(dur):"--:--:--"}</div>
       <div style="display:flex;gap:10px;margin-top:12px">${!j.startedAt?`<button class="btn primary" id="btnStart">▶ Start job</button>`:running?`<button class="btn primary" id="btnFinish">■ Finish job</button>`:`<button class="btn sm ghost" id="btnRestart">Restart timer</button>`}</div>
@@ -691,6 +760,7 @@ function renderDetail(id){const j=jobs.find(x=>x.id===id);if(!j){$("#detailBody"
     <div class="section">Customer</div>
     <div class="card"><div style="font-weight:700;font-size:17px">${esc(j.customerName||"")}</div><div class="small muted">${esc(addr||"")}</div>
       <div class="links">${j.customerPhone?`<a href="tel:${esc(j.customerPhone)}"><svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7l.7 3.3a2 2 0 0 1-.5 1.9L8 10.2a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 1.9-.5l3.3.7a2 2 0 0 1 1.5 2Z"/></svg>Call</a><a href="sms:${esc(j.customerPhone)}"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Text</a>`:""}
+      ${j.gps?`<a href="https://maps.google.com/?q=${j.gps.lat},${j.gps.lng}" target="_blank"><svg viewBox="0 0 24 24"><path d="M12 22s7-7 7-12a7 7 0 1 0-14 0c0 5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>Pinned spot</a>`:""}
       ${addr?`<a href="https://maps.google.com/?q=${encodeURIComponent(addr)}" target="_blank"><svg viewBox="0 0 24 24"><path d="M12 22s7-7 7-12a7 7 0 1 0-14 0c0 5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>Navigate</a>`:""}
       ${j.customerId?`<a href="#" id="dCust"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Profile</a>`:""}</div></div>
 
@@ -748,7 +818,7 @@ async function makePdf(j){
   const logo=await getLogo();header();
   // title
   pdf.setTextColor(...dark);pdf.setFont("helvetica","bold");pdf.setFontSize(20);pdf.text(`${vehLabel(j)}${j.reg?"  "+fmtReg(j.reg):""}`,M,y+2);
-  pdf.setFontSize(10);pdf.setFont("helvetica","normal");pdf.setTextColor(...grey);pdf.text([j.colour,j.year,j.status].filter(Boolean).join("  ·  "),M,y+9);y+=18;
+  pdf.setFontSize(10);pdf.setFont("helvetica","normal");pdf.setTextColor(...grey);pdf.text([j.jobType||"Private",j.colour,j.year,j.status].filter(Boolean).join("  ·  "),M,y+9);y+=18;
   section("Customer");kv([["Name",j.customerName],["Phone",j.customerPhone],["Address",[j.customerAddress,j.postcode].filter(Boolean).join(", ")],["Location",[j.location,j.locationNote].filter(Boolean).join(" — ")]]);
   section("Booking");const dur=j.startedAt&&j.finishedAt?fmtDur(j.finishedAt-j.startedAt):"";kv([["Date",j.bookedDate?fmtDate(j.bookedDate)+(j.bookedTime?" at "+j.bookedTime:""):"—"],["Started",j.startedAt?new Date(j.startedAt).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):""],["Finished",j.finishedAt?new Date(j.finishedAt).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):""],["Time on job",dur]]);
   section("Work carried out");kv([["Panels",(j.panels||[]).join(", ")],["Description",j.description||"—"]]);
@@ -808,6 +878,59 @@ function renderStats(){
   const rows=Object.entries(mk).sort((a,b)=>b[1].n-a[1].n);
   $("#statMakes").innerHTML=rows.length?rows.map(([k,v])=>`<div class="card spread" style="padding:11px 14px"><span style="font-weight:600">${esc(k)}</span><span class="small muted">${v.n} job${v.n===1?"":"s"} · <b style="color:var(--text)">${money(v.v)}</b></span></div>`).join(""):'<div class="muted small">No data yet.</div>';
 }
+
+/* ───────── Settings: price templates ───────── */
+$("#btnSettings").onclick=()=>{renderPriceRows();openSheet("#settingsSheet")};
+$("#settingsClose").onclick=()=>closeSheet("#settingsSheet");
+function renderPriceRows(list){const arr=list||prices||DEFAULT_PRICES;$("#priceRows").innerHTML=arr.map((p,i)=>`<div class="pricerow"><input class="input pName" value="${esc(p.name)}" placeholder="Name"><input class="input pAmt" inputmode="decimal" value="${p.amount}" placeholder="£"><button class="iconbtn pDel" data-i="${i}">×</button></div>`).join("");
+  $$(".pDel").forEach(b=>b.onclick=()=>{const cur=readPriceRows();cur.splice(Number(b.dataset.i),1);renderPriceRows(cur)})}
+function readPriceRows(){return $$(".pricerow").map(r=>({name:r.querySelector(".pName").value.trim()||"Price",amount:Number(r.querySelector(".pAmt").value)||0}))}
+$("#priceAdd").onclick=()=>{const cur=readPriceRows();cur.push({name:"Price "+(cur.length+1),amount:0});renderPriceRows(cur)};
+$("#priceSave").onclick=async()=>{await setDoc(doc(db,"settings","pricing"),{items:readPriceRows(),updatedAt:serverTimestamp()});closeSheet("#settingsSheet");toast("Prices saved")};
+
+/* ───────── Reports ───────── */
+$("#repType").onclick=e=>{const c=e.target.closest(".chip");if(!c)return;repType=c.dataset.t;$$("#repType .chip").forEach(x=>x.classList.toggle("active",x===c));renderReports()};
+$("#repRange").onclick=e=>{const c=e.target.closest(".chip");if(!c)return;repRange=c.dataset.r;$$("#repRange .chip").forEach(x=>x.classList.toggle("active",x===c));$("#repCustom").classList.toggle("hidden",repRange!=="custom");renderReports()};
+$("#repFrom").onchange=$("#repTo").onchange=renderReports;
+function repBounds(){const n=new Date(),y=n.getFullYear(),m=n.getMonth();
+  switch(repRange){case"week":return weekRange();case"month":return[ymd(new Date(y,m,1)),ymd(new Date(y,m+1,0))];case"last":return[ymd(new Date(y,m-1,1)),ymd(new Date(y,m,0))];case"year":return[`${y}-01-01`,`${y}-12-31`];default:return[$("#repFrom").value||"0000-00-00",$("#repTo").value||"9999-99-99"]}}
+function repJobs(){const[a,b]=repBounds();return jobs.filter(j=>j.status!=="Cancelled"&&j.bookedDate&&j.bookedDate>=a&&j.bookedDate<=b&&(repType==="all"||(j.jobType||"Private")===repType)).sort((x,y)=>(x.bookedDate||"").localeCompare(y.bookedDate||""))}
+function repLabel(){const[a,b]=repBounds();return{week:"This week",month:"This month",last:"Last month",year:"This year",custom:`${a} to ${b}`}[repRange]+(repType==="all"?"":" · "+repType)}
+function renderReports(){const js=repJobs();const charged=js.reduce((s,j)=>s+(Number(j.cost)||0),0),paidSum=js.filter(j=>j.paid).reduce((s,j)=>s+(Number(j.cost)||0),0);const mins=js.reduce((s,j)=>s+(j.startedAt&&j.finishedAt?(j.finishedAt-j.startedAt)/60000:0),0);
+  const ac=js.filter(j=>j.jobType==="Auto Capital").length;
+  $("#repGrid").innerHTML=[["Jobs",js.length],["Charged",money(charged)],["Paid",money(paidSum)],["Outstanding",money(charged-paidSum)],["Hours worked",(mins/60).toFixed(1)],["Auto Capital / Private",`${ac} / ${js.length-ac}`]].map(([k,v])=>`<div class="stat"><div class="v" style="font-size:22px">${v}</div><div class="k">${k}</div></div>`).join("");
+  $("#repTitle").textContent=`${repLabel()} · ${js.length} job${js.length===1?"":"s"}`;
+  $("#repList").innerHTML=js.length?js.map(jobCard).join(""):'<div class="empty small">No jobs in this period.</div>'}
+$("#repCsv").onclick=()=>{const js=repJobs();const h=["Date","Time","Type","Customer","Phone","Postcode","Reg","Make","Model","Colour","Panels","Description","Status","Started","Finished","Minutes","Quoted","Charged","Paid","Pay method"];
+  const q=v=>`"${String(v??"").replace(/"/g,'""')}"`;const rows=js.map(j=>[j.bookedDate,j.bookedTime,j.jobType||"Private",j.customerName,j.customerPhone,j.postcode,j.reg,j.make,j.model,j.colour,(j.panels||[]).join("; "),j.description,j.status,j.startedAt?new Date(j.startedAt).toLocaleString("en-GB"):"",j.finishedAt?new Date(j.finishedAt).toLocaleString("en-GB"):"",j.startedAt&&j.finishedAt?Math.round((j.finishedAt-j.startedAt)/60000):"",j.quote||0,j.cost||0,j.paid?"Yes":"No",j.payMethod||""].map(q).join(","));
+  const blob=new Blob(["\ufeff"+[h.map(q).join(","),...rows].join("\n")],{type:"text/csv"});const name=`CK-Dentmaster-jobs-${repBounds().join("_")}.csv`;shareOrDownload(blob,name,"text/csv")};
+async function shareOrDownload(blob,name,type){const file=new File([blob],name,{type});if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:name});return}catch(e){if(e.name==="AbortError")return}}
+  const u=URL.createObjectURL(blob);const a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),5000);toast("Downloaded "+name)}
+$("#repPdf").onclick=async()=>{if(!window.jspdf)return toast("PDF library still loading – try again");const js=repJobs();if(!js.length)return toast("No jobs in this period");toast("Building report…");
+  const {jsPDF}=window.jspdf;const pdf=new jsPDF({unit:"mm",format:"a4",orientation:"landscape"});const W=297,M=12;const lime=[182,242,26],dark=[20,20,20],grey=[110,110,110];const logo=await getLogo();let y;
+  const header=()=>{pdf.setFillColor(...dark);pdf.rect(0,0,W,24,"F");pdf.addImage(logo,"PNG",M,4,40,16);pdf.setTextColor(...lime);pdf.setFont("helvetica","bold");pdf.setFontSize(14);pdf.text("JOBS REPORT",W-M,11,{align:"right"});pdf.setTextColor(200,200,200);pdf.setFont("helvetica","normal");pdf.setFontSize(9);pdf.text(`${repLabel()} · generated ${new Date().toLocaleDateString("en-GB")}`,W-M,17,{align:"right"});y=32};
+  const cols=[["Date",22],["Type",20],["Customer",38],["Vehicle",46],["Reg",20],["Work",70],["Status",22],["Time",16],["Charged",19]];
+  const head=()=>{pdf.setFillColor(235,235,235);pdf.rect(M,y,W-M*2,7,"F");pdf.setFont("helvetica","bold");pdf.setFontSize(8.5);pdf.setTextColor(...dark);let x=M+2;cols.forEach(([c,w])=>{pdf.text(c,c==="Charged"?x+w-4:x,y+4.8,{align:c==="Charged"?"right":"left"});x+=w});y+=8};
+  header();head();pdf.setFont("helvetica","normal");
+  js.forEach((j,i)=>{const cells=[fmtDate(j.bookedDate).replace(/^\w+,\s/,""),j.jobType||"Private",j.customerName||"",vehLabel(j)+(j.colour?" · "+j.colour:""),fmtReg(j.reg),j.description||(j.panels||[]).join(", "),j.status+(j.paid?" (paid)":""),j.startedAt&&j.finishedAt?fmtDur(j.finishedAt-j.startedAt):"",money(j.cost)];
+    const wrapped=cells.map((c,k)=>pdf.splitTextToSize(String(c),cols[k][1]-4));const h=Math.max(...wrapped.map(w=>w.length))*4+3;
+    if(y+h>200){pdf.addPage();header();head()}
+    if(i%2)pdf.setFillColor(248,248,248),pdf.rect(M,y,W-M*2,h,"F");
+    let x=M+2;pdf.setTextColor(30,30,30);pdf.setFontSize(8.5);wrapped.forEach((w,k)=>{pdf.text(w,cols[k][0]==="Charged"?x+cols[k][1]-4:x,y+4,{align:cols[k][0]==="Charged"?"right":"left"});x+=cols[k][1]});y+=h});
+  const charged=js.reduce((s,j)=>s+(Number(j.cost)||0),0),paidSum=js.filter(j=>j.paid).reduce((s,j)=>s+(Number(j.cost)||0),0),mins=js.reduce((s,j)=>s+(j.startedAt&&j.finishedAt?(j.finishedAt-j.startedAt)/60000:0),0);
+  if(y+22>200){pdf.addPage();header()}y+=4;pdf.setFillColor(...dark);pdf.roundedRect(M,y,W-M*2,14,2,2,"F");pdf.setTextColor(...lime);pdf.setFont("helvetica","bold");pdf.setFontSize(11);
+  pdf.text(`${js.length} jobs · ${(mins/60).toFixed(1)} hours`,M+5,y+9);pdf.text(`Charged ${money(charged)}   Paid ${money(paidSum)}   Outstanding ${money(charged-paidSum)}`,W-M-5,y+9,{align:"right"});
+  const n=pdf.internal.getNumberOfPages();for(let i=1;i<=n;i++){pdf.setPage(i);pdf.setFontSize(8);pdf.setTextColor(...grey);pdf.text("CK Dentmaster · Paintless dent repair",M,205);pdf.text(`Page ${i} of ${n}`,W-M,205,{align:"right"})}
+  shareOrDownload(pdf.output("blob"),`CK-Dentmaster-report-${repBounds().join("_")}.pdf`,"application/pdf")};
+
+/* ───────── Sample job ───────── */
+$("#btnSeed").onclick=async()=>{if(!confirm("Add the sample job (Ajay Kawa, Range Rover Evoque, 24 Oct 2026)?"))return;
+  try{const seed=await import("./seed-data.js");const cust={name:"Ajay Kawa",phone:"07810 778 794",email:"aj@ykawa.com",address:"31a Fulmer Drive",postcode:"SL9 7HG",notes:"Sample customer",createdAt:serverTimestamp(),updatedAt:serverTimestamp()};
+    let c=customers.find(x=>x.phone?.replace(/\s/g,"")==="07810778794");const customerId=c?c.id:(await addDoc(collection(db,"customers"),cust)).id;
+    const job={jobType:"Private",gps:null,customerId,customerName:cust.name,customerPhone:cust.phone,customerEmail:cust.email,customerAddress:cust.address,postcode:cust.postcode,location:"Customer's address",locationNote:"",reg:"",make:"Land Rover",model:"Range Rover Evoque",colour:"Black",year:"",panels:["Bonnet"],description:"Bonnet Dent",notes:"Sample job",bookedDate:"2026-10-24",bookedTime:"11:00",status:"Booked",quote:100,cost:100,paid:false,payMethod:"Bank transfer",photoCount:2,createdAt:serverTimestamp(),updatedAt:serverTimestamp()};
+    const r=await addDoc(collection(db,"jobs"),job);
+    for(const ph of seed.SAMPLE_PHOTOS)await addDoc(collection(db,"jobs",r.id,"photos"),{type:ph.type,data:ph.data,createdAt:serverTimestamp()});
+    closeSheet("#settingsSheet");toast("Sample job added");openDetail(r.id)}catch(e){console.error(e);toast("Could not add sample: "+e.message)}};
 
 /* ───────── PWA ───────── */
 if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});

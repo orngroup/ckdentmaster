@@ -10,7 +10,11 @@ A mobile job-management app for CK Dentmaster (paintless dent repair). It is an 
 - Job detail with **Start / Finish timer** (time per job), before/after **photos**, call / text / navigate buttons, mark as paid
 - **PDF report** built on the phone (logo, customer, vehicle, work, before/after photos, time, cost) – shares straight to WhatsApp, Mail, etc.
 - **Job link** – a public web page for the customer (`report.html?r=…`) with photos and cost, shareable by WhatsApp; the customer can save it as a PDF
+- **Job types** – Auto Capital or Private, with filters on the jobs list and reports
+- **Price templates** – tap Price 1–4 (£100/£150/£200/£250 by default) to fill the price, still editable per job; edit the templates under Settings (gear icon)
+- **Reports tab** – this week / month / last month / year / custom range, by job type; totals plus a landscape PDF report and CSV export, both shareable
 - Customers list with job history and paid total
+- "Use my current location" on the job form pins GPS to the job (asks for location permission); photos ask for camera permission the first time
 - Stats: jobs, charged, paid, outstanding, average time and £ per job, breakdown by manufacturer
 - Works offline (Firestore cache) and syncs when back online
 
@@ -59,6 +63,8 @@ The CK icon appears on the home screen and the app opens full-screen.
 
 ## Day-to-day
 
+- First run: **Settings (gear) → Load sample job** adds Ajay Kawa / Range Rover Evoque, 24 Oct 2026 11:00, with before/after photos so you can see everything working. Delete it from the job screen when done.
+
 - **+** → add a job. Pick an existing customer or type a new one (customers are created automatically and matched by phone number).
 - Manufacturer / model lists cover the common UK makes. Choose **Other / add new…** to type one – it's remembered.
 - **Start job** when you begin, **Finish job** when done – the duration is saved and used for the average-time stat and the report.
@@ -69,7 +75,7 @@ The CK icon appears on the home screen and the app opens full-screen.
 
 ## Updating the app
 
-Edit `index.html`, bump `CACHE = "ckdm-v2"` in `sw.js`, push to `main`. Phones pick up the new version next time the app opens online.
+Edit `index.html`, bump `CACHE = "ckdm-v5"` in `sw.js`, push to `main`. Phones pick up the new version next time the app opens online.
 
 ## Data model (Firestore)
 
@@ -80,5 +86,6 @@ Edit `index.html`, bump `CACHE = "ckdm-v2"` in `sw.js`, push to `main`. Phones p
 | `jobs/{id}/photos/{id}` | type (before/after), data (JPEG data URL) |
 | `public_reports/{token}` | read-only copy of a job for the customer link |
 | `settings/vehicles` | makes/models you have added |
+| `settings/pricing` | price templates (items: name, amount) |
 
 Photos are kept in Firestore so the project stays on the free Spark plan (no Storage bucket or card needed).
