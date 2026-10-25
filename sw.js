@@ -1,6 +1,6 @@
 // CK Dentmaster service worker – caches the app shell so it opens offline.
 // Bump CACHE when you change index.html so phones pick up the new version.
-const CACHE = "ckdm-v4";
+const CACHE = "ckdm-v5";
 const SHELL = ["./", "./index.html", "./firebase-config.js", "./manifest.json", "./report.html", "./logo.png",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/icon-180.png"];
 
