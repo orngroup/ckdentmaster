@@ -50,9 +50,9 @@ a{color:var(--lime)}
 .topbar img{height:34px}
 .topbar .title{font-weight:700;font-size:17px;text-transform:uppercase;letter-spacing:.05em}
 .content{flex:1;padding:14px 14px calc(92px + var(--safe-b))}
-.bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(14,14,14,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:6px 0 calc(6px + var(--safe-b))}
+.bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(14,14,14,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(6,1fr);padding:6px 0 calc(6px + var(--safe-b))}
 .bottomnav button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
-.bottomnav button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.bottomnav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .bottomnav button.active{color:var(--lime)}
 
 /* ── Components ── */
@@ -70,6 +70,10 @@ a{color:var(--lime)}
 .field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
 .field label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 .input{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:11px;padding:13px 14px;font-size:16px;outline:none;color:var(--text);appearance:none;-webkit-appearance:none}
+input[type=date].input,input[type=time].input{appearance:auto;-webkit-appearance:none;min-height:50px;color-scheme:dark;display:block;text-align:left;position:relative}
+input[type=date].input::-webkit-date-and-time-value,input[type=time].input::-webkit-date-and-time-value{text-align:left;min-height:1.4em}
+input[type=date].input::-webkit-calendar-picker-indicator,input[type=time].input::-webkit-calendar-picker-indicator{filter:invert(.8);opacity:.9;cursor:pointer}
+input[type=date].input:invalid,input[type=date].input[value=""]{color:var(--text)}
 .input:focus{border-color:var(--lime)}
 textarea.input{min-height:110px;resize:vertical}
 select.input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%239a9a9a' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:38px}
@@ -247,6 +251,17 @@ select.input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
       <div id="custList"></div>
     </div>
 
+    <!-- INVOICES -->
+    <div id="view-invoices" class="hidden">
+      <div class="stats" id="invStats" style="grid-template-columns:1fr 1fr 1fr"></div>
+      <div class="chips" id="invFilters">
+        <button class="chip active" data-f="outstanding">Outstanding</button>
+        <button class="chip" data-f="paid">Paid</button>
+        <button class="chip" data-f="all">All</button>
+      </div>
+      <div id="invList"></div>
+    </div>
+
     <!-- REPORTS -->
     <div id="view-reports" class="hidden">
       <div class="chips" id="repType">
@@ -290,6 +305,7 @@ select.input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
   <nav class="bottomnav">
     <button data-v="jobs" class="active"><svg viewBox="0 0 24 24"><path d="M3 7h18v13H3zM8 7V4h8v3"/></svg>Jobs</button>
     <button data-v="calendar"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Calendar</button>
+    <button data-v="invoices"><svg viewBox="0 0 24 24"><path d="M4 2h16v20l-3-2-3 2-2-2-2 2-3-2-3 2zM8 8h8M8 12h8M8 16h5"/></svg>Invoices</button>
     <button data-v="customers"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Customers</button>
     <button data-v="reports"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h5"/></svg>Reports</button>
     <button data-v="stats"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Stats</button>
@@ -410,6 +426,42 @@ select.input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
   <div class="footer"><button class="btn primary" id="custSave">Save</button></div>
 </div>
 
+<!-- ───────── INVOICE EDITOR SHEET ───────── -->
+<div class="sheet" id="invSheet">
+  <div class="topbar">
+    <button class="iconbtn" id="invClose"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <div class="title" id="invTitle">New invoice</div><span style="width:40px"></span>
+  </div>
+  <div class="content">
+    <div class="section">Bill to</div>
+    <div class="field"><label>Contact name</label><input id="iName" class="input" placeholder="e.g. Keith/Stash"></div>
+    <div class="field"><label>Company</label><input id="iCompany" class="input" placeholder="optional"></div>
+    <div class="field"><label>Address</label><textarea id="iAddress" class="input" style="min-height:80px" placeholder="One line per row"></textarea></div>
+    <div class="row"><div class="field"><label>Phone</label><input id="iPhone" class="input" type="tel"></div><div class="field"><label>Mobile</label><input id="iPhone2" class="input" type="tel"></div></div>
+    <div class="field"><label>Email</label><input id="iEmail" class="input" type="email"></div>
+    <div class="section">Lines</div>
+    <div id="iLines"></div>
+    <button type="button" class="btn sm" id="iLineAdd">+ Add line</button>
+    <div class="spread" style="margin:14px 0 4px;font-size:18px;font-weight:700"><span>Total</span><span id="iTotal" style="color:var(--lime)">£0.00</span></div>
+    <div class="section">Details</div>
+    <div class="row"><div class="field"><label>Invoice date</label><input id="iDate" class="input" type="date"></div><div class="field"><label>Due</label><select id="iDue" class="input"><option>On Receipt</option><option>7 days</option><option>14 days</option><option>30 days</option></select></div></div>
+    <div class="toggle"><span>Already paid</span><button class="sw" id="iPaid" type="button"></button></div>
+    <div class="row" id="iPaidRow" style="display:none"><div class="field"><label>Paid on</label><input id="iPaidDate" class="input" type="date"></div><div class="field"><label>Method</label><select id="iPayMethod" class="input"><option>Bank Transfer</option><option>Cash</option><option>Card</option><option>Other</option></select></div></div>
+    <div class="toggle"><span>Include before/after photos</span><button class="sw on" id="iPhotos" type="button"></button></div>
+    <div class="field"><label>Note on invoice</label><input id="iNote" class="input" placeholder="optional"></div>
+  </div>
+  <div class="footer"><button class="btn primary" id="invSave">Create invoice &amp; job report</button></div>
+</div>
+
+<!-- ───────── INVOICE DETAIL SHEET ───────── -->
+<div class="sheet" id="invDetailSheet">
+  <div class="topbar">
+    <button class="iconbtn" id="invDetailClose"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+    <div class="title">Invoice</div><span style="width:40px"></span>
+  </div>
+  <div class="content" id="invDetailBody"></div>
+</div>
+
 <!-- ───────── SETTINGS SHEET ───────── -->
 <div class="sheet" id="settingsSheet">
   <div class="topbar">
@@ -421,12 +473,27 @@ select.input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
     <div class="small muted" style="margin-bottom:10px">Tap a template when adding a job to fill the price. Edit the names and amounts here.</div>
     <div id="priceRows"></div>
     <button class="btn sm" id="priceAdd" style="margin-top:4px">+ Add template</button>
+    <div class="section">Business details (shown on invoices)</div>
+    <div class="field"><label>Trading name</label><input id="bName" class="input"></div>
+    <div class="field"><label>Address</label><textarea id="bAddress" class="input" style="min-height:70px"></textarea></div>
+    <div class="row"><div class="field"><label>Phone</label><input id="bPhone" class="input" type="tel"></div><div class="field"><label>Email</label><input id="bEmail" class="input" type="email"></div></div>
+    <div class="section">Bank details</div>
+    <div class="field"><label>Bank</label><input id="bBank" class="input"></div>
+    <div class="row"><div class="field"><label>Account no</label><input id="bAcc" class="input" inputmode="numeric"></div><div class="field"><label>Sort code</label><input id="bSort" class="input" inputmode="numeric"></div></div>
+    <div class="field"><label>Account name</label><input id="bAccName" class="input"></div>
+    <div class="row"><div class="field"><label>Invoice prefix</label><input id="bPrefix" class="input"></div><div class="field"><label>Next invoice no.</label><input id="bNext" class="input" inputmode="numeric"></div></div>
+    <div class="section">Auto Capital – bill to defaults</div>
+    <div class="field"><label>Contact name</label><input id="acName" class="input"></div>
+    <div class="field"><label>Company</label><input id="acCompany" class="input"></div>
+    <div class="field"><label>Address</label><textarea id="acAddress" class="input" style="min-height:70px"></textarea></div>
+    <div class="row"><div class="field"><label>Phone</label><input id="acPhone" class="input" type="tel"></div><div class="field"><label>Mobile</label><input id="acPhone2" class="input" type="tel"></div></div>
+    <div class="field"><label>Email</label><input id="acEmail" class="input" type="email"></div>
     <div class="section">Sample data</div>
     <button class="btn sm" id="btnSeed">Load sample job (Ajay Kawa – Range Rover)</button>
     <div class="section">App</div>
-    <div class="small muted">Version 4 · CK Dentmaster job manager</div>
+    <div class="small muted">Version 6 · CK Dentmaster job manager</div>
   </div>
-  <div class="footer"><button class="btn primary" id="priceSave">Save prices</button></div>
+  <div class="footer"><button class="btn primary" id="priceSave">Save settings</button></div>
 </div>
 
 <div id="lightbox" class="hidden"><img id="lightboxImg" alt=""><button class="iconbtn close" id="lightboxClose"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
@@ -533,7 +600,10 @@ if(!standalone){$("#installCard").classList.remove("hidden");(isIOS?$("#installI
 $("#btnSignOut").onclick=()=>{if(confirm("Sign out?"))signOut(auth)};
 
 /* ───────── State ───────── */
-let jobs=[],customers=[],vehicleExtras={makes:{}},prices=null;
+let jobs=[],customers=[],vehicleExtras={makes:{}},prices=null,invoices=[];
+const DEFAULT_BIZ={name:"CK Dentmaster",address:"Stanmore\nMiddlesex",phone:"07956145518",email:"jaykhatri06@gmail.com",bank:"NatWest",acc:"88125831",sort:"60-10-16",accName:"CK Dent Masters",prefix:"CK-",next:1,
+  ac:{name:"Keith/Stash",company:"Auto Capital LTD",address:"The Lynch House\n7 Parr Road\nStanmore HA7 1LE",phone:"02089655990",phone2:"07760 621111",email:"accounts@autocapital.co.uk"}};
+let biz={...DEFAULT_BIZ};let invFilter="outstanding";
 const DEFAULT_PRICES=[{name:"Price 1",amount:100},{name:"Price 2",amount:150},{name:"Price 3",amount:200},{name:"Price 4",amount:250}];
 let jobFilter="open",typeFilter="all",statRange="month",calMonth=new Date(),calSel=todayStr(),repRange="month",repType="all";
 let unsub=[];
@@ -546,6 +616,8 @@ if(configured)onAuthStateChanged(auth,u=>{
     unsub.push(onSnapshot(query(collection(db,"customers"),orderBy("name","asc")),s=>{customers=s.docs.map(d=>({id:d.id,...d.data()}));renderCustomers();fillCustPick()}));
     unsub.push(onSnapshot(doc(db,"settings","vehicles"),s=>{vehicleExtras=s.exists()?s.data():{makes:{}};fillMakes()}));
     unsub.push(onSnapshot(doc(db,"settings","pricing"),s=>{prices=s.exists()?(s.data().items||DEFAULT_PRICES):DEFAULT_PRICES;renderPriceChips()}));
+    unsub.push(onSnapshot(doc(db,"settings","business"),s=>{biz=s.exists()?{...DEFAULT_BIZ,...s.data(),ac:{...DEFAULT_BIZ.ac,...(s.data().ac||{})}}:{...DEFAULT_BIZ}}));
+    unsub.push(onSnapshot(query(collection(db,"invoices"),orderBy("number","desc")),s=>{invoices=s.docs.map(d=>({id:d.id,...d.data()}));renderInvoices();if(openInvId)renderInvDetail(openInvId);if(!$("#view-stats").classList.contains("hidden"))renderStats()}));
   }else{$("#authScreen").classList.remove("hidden");$("#app").classList.add("hidden")}
 });
 
@@ -553,9 +625,9 @@ if(configured)onAuthStateChanged(auth,u=>{
 $$(".bottomnav button").forEach(b=>b.onclick=()=>showView(b.dataset.v));
 function showView(v){
   $$(".bottomnav button").forEach(b=>b.classList.toggle("active",b.dataset.v===v));
-  ["jobs","calendar","customers","reports","stats"].forEach(x=>$("#view-"+x).classList.toggle("hidden",x!==v));
-  $("#fabAdd").classList.toggle("hidden",v==="stats"||v==="reports");
-  if(v==="calendar")renderCalendar(); if(v==="stats")renderStats(); if(v==="reports")renderReports();
+  ["jobs","calendar","invoices","customers","reports","stats"].forEach(x=>$("#view-"+x).classList.toggle("hidden",x!==v));
+  $("#fabAdd").classList.toggle("hidden",v==="stats"||v==="reports"||v==="invoices");
+  if(v==="calendar")renderCalendar(); if(v==="stats")renderStats(); if(v==="reports")renderReports(); if(v==="invoices")renderInvoices();
   window.scrollTo(0,0);
 }
 function renderAll(){renderJobs();if(!$("#view-reports").classList.contains("hidden"))renderReports();if(!$("#view-calendar").classList.contains("hidden"))renderCalendar();if(!$("#view-stats").classList.contains("hidden"))renderStats();if(!$("#view-customers").classList.contains("hidden"))renderCustomers();if(openJobId)renderDetail(openJobId)}
@@ -753,6 +825,7 @@ function renderDetail(id){const j=jobs.find(x=>x.id===id);if(!j){$("#detailBody"
   const dur=j.startedAt&&j.finishedAt?j.finishedAt-j.startedAt:0;
   const running=j.status==="In progress"&&j.startedAt&&!j.finishedAt;
   const before=photos.filter(p=>p.type==="before"),after=photos.filter(p=>p.type==="after");
+  const inv=invoices.find(i=>i.jobId===id);
   const grid=(arr,type)=>`<div class="photogrid">${arr.map(p=>`<div class="ph"><img src="${p.data}" data-full="${p.id}" alt=""><button class="del" data-del="${p.id}">×</button></div>`).join("")}
     <button class="add" data-add="${type}"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Add photo</button></div>`;
   $("#detailBody").innerHTML=`
@@ -760,7 +833,7 @@ function renderDetail(id){const j=jobs.find(x=>x.id===id);if(!j){$("#detailBody"
       <div style="margin-top:10px"><span class="badge ${j.jobType==="Auto Capital"?"t-ac":"t-pr"}">${esc(j.jobType||"Private")}</span> <span class="badge ${STATUS_CLASS[j.status]||""}">${esc(j.status)}</span> ${j.paid?'<span class="badge s-paid">Paid</span>':""}</div></div>
 
     ${j.status!=="Cancelled"?`<div class="timerbox"><div class="l">${running?"In progress":dur?"Time on job":"Job timer"}</div><div class="t" id="timerDisp">${running?fmtClock(Date.now()-j.startedAt):dur?fmtDur(dur):"--:--:--"}</div>
-      <div style="display:flex;gap:10px;margin-top:12px">${!j.startedAt?`<button class="btn primary" id="btnStart">▶ Start job</button>`:running?`<button class="btn primary" id="btnFinish">■ Finish job</button>`:`<button class="btn sm ghost" id="btnRestart">Restart timer</button>`}</div>
+      <div style="display:flex;gap:10px;margin-top:12px">${!j.startedAt?`<button class="btn primary" id="btnStart">▶ Start job</button>`:running?`<button class="btn primary" id="btnFinish">■ Finish &amp; invoice</button><button class="btn sm ghost" id="btnFinishOnly" style="width:auto">Finish only</button>`:`<button class="btn sm ghost" id="btnRestart">Restart timer</button>`}</div>
       ${j.startedAt?`<div class="small muted" style="margin-top:8px">Started ${new Date(j.startedAt).toLocaleString("en-GB",{weekday:"short",hour:"2-digit",minute:"2-digit",day:"numeric",month:"short"})}${j.finishedAt?" · Finished "+new Date(j.finishedAt).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}):""}</div>`:""}</div>`:""}
 
     <div class="section">Booking</div>
@@ -783,6 +856,11 @@ function renderDetail(id){const j=jobs.find(x=>x.id===id);if(!j){$("#detailBody"
     <div class="card"><dl class="kv"><dt>Quoted</dt><dd>${money(j.quote)}</dd><dt>Charged</dt><dd style="color:var(--lime);font-weight:700;font-size:18px">${money(j.cost)}</dd><dt>Payment</dt><dd>${j.paid?`Paid · ${esc(j.payMethod||"")}${j.paidAt?" · "+new Date(j.paidAt).toLocaleDateString("en-GB"):""}`:"Outstanding"}</dd></dl>
       ${!j.paid&&j.status!=="Cancelled"?`<button class="btn primary" style="margin-top:12px" id="btnMarkPaid">Mark as paid</button>`:""}</div>
 
+    <div class="section">Invoice</div>
+    <div class="card">${inv?`<div class="spread"><div><div style="font-weight:700;font-size:17px">${esc(inv.number)}</div><div class="small muted">${fmtDate(inv.date)} · ${esc(inv.billTo?.company||inv.billTo?.name||"")}</div></div><div style="text-align:right"><div class="cost">${money(inv.total)}</div><span class="badge ${inv.paid?"s-paid":"s-inprogress"}">${inv.paid?"Paid":"Outstanding"}</span></div></div>
+      <div style="display:flex;gap:10px;margin-top:12px"><button class="btn sm" id="btnInvOpen">Open invoice</button><button class="btn sm primary" id="btnInvPdf">Invoice PDF</button></div>`
+      :`<div class="small muted" style="margin-bottom:10px">No invoice yet for this job.</div><button class="btn primary" id="btnInvoice"><svg viewBox="0 0 24 24"><path d="M4 2h16v20l-3-2-3 2-2-2-2 2-3-2-3 2zM8 8h8M8 12h8M8 16h5"/></svg>Create invoice &amp; job report</button>`}</div>
+
     <div class="section">Report &amp; sharing</div>
     <div class="card" style="display:flex;flex-direction:column;gap:10px">
       <button class="btn primary" id="btnPdf"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M9 15h6M9 11h2"/></svg>Create PDF report</button>
@@ -793,7 +871,12 @@ function renderDetail(id){const j=jobs.find(x=>x.id===id);if(!j){$("#detailBody"
     <div style="margin-top:14px"><button class="btn danger" id="btnDelete">Delete job</button></div>`;
   const on=(s,f)=>{const el=$(s);if(el)el.onclick=f};
   on("#btnStart",()=>updateDoc(doc(db,"jobs",id),{startedAt:Date.now(),finishedAt:null,status:"In progress"}));
-  on("#btnFinish",()=>{const now=Date.now();updateDoc(doc(db,"jobs",id),{finishedAt:now,durationMins:Math.round((now-j.startedAt)/60000),status:"Completed"})});
+  const finish=async()=>{const now=Date.now();await updateDoc(doc(db,"jobs",id),{finishedAt:now,durationMins:Math.round((now-j.startedAt)/60000),status:"Completed"})};
+  on("#btnFinishOnly",finish);
+  on("#btnFinish",async()=>{await finish();openInvoiceEditor(id)});
+  on("#btnInvoice",()=>openInvoiceEditor(id));
+  on("#btnInvOpen",()=>openInvDetail(inv.id));
+  on("#btnInvPdf",()=>makeInvoicePdf(inv,true));
   on("#btnRestart",()=>{if(confirm("Restart the timer from now?"))updateDoc(doc(db,"jobs",id),{startedAt:Date.now(),finishedAt:null,status:"In progress"})});
   on("#btnMarkPaid",async()=>{let c=j.cost;if(!c){const v=prompt("Amount charged (£)",j.quote||"");if(v===null)return;c=Number(v)||0}await updateDoc(doc(db,"jobs",id),{paid:true,paidAt:Date.now(),status:"Paid",cost:c});toast("Marked as paid")});
   on("#btnDelete",async()=>{if(!confirm("Delete this job and its photos?"))return;const b=writeBatch(db);photos.forEach(p=>b.delete(doc(db,"jobs",id,"photos",p.id)));b.delete(doc(db,"jobs",id));await b.commit();$("#detailClose").click();toast("Job deleted")});
@@ -814,9 +897,9 @@ $("#lightboxClose").onclick=closeLb;$("#lightbox").onclick=e=>{if(e.target.id===
 let logoData=null;
 async function getLogo(){if(logoData)return logoData;const b=await (await fetch("logo.png")).blob();logoData=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(b)});return logoData}
 function imgDims(data){return new Promise(r=>{const i=new Image();i.onload=()=>r([i.width,i.height]);i.onerror=()=>r([4,3]);i.src=data})}
-async function makePdf(j){
+async function makePdf(j,returnBlob){
   if(!window.jspdf)return toast("PDF library still loading – try again");
-  toast("Building PDF…");
+  if(!returnBlob)toast("Building PDF…");
   const {jsPDF}=window.jspdf;const pdf=new jsPDF({unit:"mm",format:"a4"});const W=210,M=14;let y=0;
   const lime=[182,242,26],dark=[20,20,20],grey=[110,110,110];
   const header=()=>{pdf.setFillColor(...dark);pdf.rect(0,0,W,30,"F");pdf.addImage(logo,"PNG",M,6,46,18);pdf.setTextColor(...lime);pdf.setFont("helvetica","bold");pdf.setFontSize(16);pdf.text("JOB REPORT",W-M,14,{align:"right"});pdf.setTextColor(200,200,200);pdf.setFont("helvetica","normal");pdf.setFontSize(9);pdf.text(`Ref ${j.id.slice(-6).toUpperCase()} · ${new Date().toLocaleDateString("en-GB")}`,W-M,21,{align:"right"});y=40};
@@ -840,8 +923,8 @@ async function makePdf(j){
   need(22);pdf.setFillColor(...dark);pdf.roundedRect(M,y,W-M*2,16,2,2,"F");pdf.setTextColor(...lime);pdf.setFont("helvetica","bold");pdf.setFontSize(13);pdf.text("TOTAL",M+5,y+10.5);pdf.text(money(j.cost),W-M-5,y+10.5,{align:"right"});y+=22;
   pdf.setFontSize(9);pdf.setTextColor(...grey);pdf.setFont("helvetica","normal");pdf.text("Thank you for choosing CK Dentmaster. Please get in touch if you have any questions about this work.",M,y+4);
   footer();
-  const name=`CK-Dentmaster-${(j.reg||j.customerName||"job").replace(/\s+/g,"")}-${j.bookedDate||todayStr()}.pdf`;
-  const blob=pdf.output("blob");const file=new File([blob],name,{type:"application/pdf"});
+  const name=`CK-Dentmaster-report-${(j.reg||j.customerName||"job").replace(/\s+/g,"")}-${j.bookedDate||todayStr()}.pdf`;
+  const blob=pdf.output("blob");if(returnBlob)return{blob,name};const file=new File([blob],name,{type:"application/pdf"});
   if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:"CK Dentmaster job report"});return}catch(e){if(e.name==="AbortError")return}}
   const u=URL.createObjectURL(blob);const aEl=document.createElement("a");aEl.href=u;aEl.download=name;document.body.appendChild(aEl);aEl.click();aEl.remove();setTimeout(()=>URL.revokeObjectURL(u),5000);toast("PDF downloaded");
 }
@@ -882,20 +965,157 @@ function renderStats(){
   const revenue=js.reduce((s,j)=>s+(Number(j.cost)||0),0),paidSum=js.filter(j=>j.paid).reduce((s,j)=>s+(Number(j.cost)||0),0);
   const timed=done.filter(j=>j.startedAt&&j.finishedAt);const avg=timed.length?timed.reduce((s,j)=>s+(j.finishedAt-j.startedAt),0)/timed.length:0;
   const outstanding=jobs.filter(j=>!j.paid&&["Completed","Invoiced"].includes(j.status)).reduce((s,j)=>s+(Number(j.cost)||Number(j.quote)||0),0);
-  $("#statGrid").innerHTML=[["Jobs",js.length],["Completed",done.length],["Charged",money(revenue)],["Paid",money(paidSum)],["Outstanding (all)",money(outstanding)],["Avg time / job",avg?fmtDur(avg):"—"],["Avg £ / job",done.length?money(revenue/Math.max(done.length,1)):"—"],["Booked ahead",jobs.filter(j=>j.bookedDate>todayStr()&&j.status==="Booked").length]].map(([k,v])=>`<div class="stat"><div class="v">${v}</div><div class="k">${k}</div></div>`).join("");
+  $("#statGrid").innerHTML=[["Jobs",js.length],["Completed",done.length],["Charged",money(revenue)],["Paid",money(paidSum)],["Outstanding (all)",money(outstanding)],["Avg time / job",avg?fmtDur(avg):"—"],["Avg £ / job",done.length?money(revenue/Math.max(done.length,1)):"—"],["Booked ahead",jobs.filter(j=>j.bookedDate>todayStr()&&j.status==="Booked").length],["Invoiced",money(invoices.reduce((s,i)=>s+(Number(i.total)||0),0))],["Invoices unpaid",money(invoices.filter(i=>!i.paid).reduce((s,i)=>s+(Number(i.total)||0),0))]].map(([k,v])=>`<div class="stat"><div class="v" style="font-size:${String(v).length>10?18:26}px">${v}</div><div class="k">${k}</div></div>`).join("");
   const mk={};js.forEach(j=>{const k=j.make||"Unknown";mk[k]=mk[k]||{n:0,v:0};mk[k].n++;mk[k].v+=Number(j.cost)||0});
   const rows=Object.entries(mk).sort((a,b)=>b[1].n-a[1].n);
   $("#statMakes").innerHTML=rows.length?rows.map(([k,v])=>`<div class="card spread" style="padding:11px 14px"><span style="font-weight:600">${esc(k)}</span><span class="small muted">${v.n} job${v.n===1?"":"s"} · <b style="color:var(--text)">${money(v.v)}</b></span></div>`).join(""):'<div class="muted small">No data yet.</div>';
 }
 
+/* ───────── Invoices ───────── */
+let invJobId=null,invLines=[],invPaid=false,invPhotos=true,openInvId=null,editInvId=null;
+const invTotal=()=>invLines.reduce((s,l)=>s+(Number(l.rate)||0)*(Number(l.qty)||0),0);
+function renderInvLines(){$("#iLines").innerHTML=invLines.map((l,i)=>`<div class="card" style="padding:10px"><div class="field" style="margin-bottom:8px"><input class="input lDesc" data-i="${i}" value="${esc(l.description)}" placeholder="Description"></div><div class="row3" style="grid-template-columns:1fr 70px 36px"><input class="input lRate" data-i="${i}" inputmode="decimal" value="${l.rate}" placeholder="Rate £"><input class="input lQty" data-i="${i}" inputmode="numeric" value="${l.qty}" placeholder="Qty"><button class="iconbtn lDel" data-i="${i}">×</button></div></div>`).join("");
+  $("#iTotal").textContent=money(invTotal());
+  $$(".lDesc,.lRate,.lQty").forEach(el=>el.oninput=()=>{const l=invLines[el.dataset.i];if(el.classList.contains("lDesc"))l.description=el.value;else if(el.classList.contains("lRate"))l.rate=el.value;else l.qty=el.value;$("#iTotal").textContent=money(invTotal())});
+  $$(".lDel").forEach(b=>b.onclick=()=>{invLines.splice(Number(b.dataset.i),1);if(!invLines.length)invLines.push({description:"",rate:"",qty:1});renderInvLines()})}
+$("#iLineAdd").onclick=()=>{invLines.push({description:"",rate:"",qty:1});renderInvLines()};
+$("#iPaid").onclick=()=>{invPaid=!invPaid;$("#iPaid").classList.toggle("on",invPaid);$("#iPaidRow").style.display=invPaid?"":"none";if(invPaid&&!$("#iPaidDate").value)$("#iPaidDate").value=todayStr()};
+$("#iPhotos").onclick=()=>{invPhotos=!invPhotos;$("#iPhotos").classList.toggle("on",invPhotos)};
+$("#invClose").onclick=()=>closeSheet("#invSheet");
+function openInvoiceEditor(jobId,existing){
+  const j=jobs.find(x=>x.id===jobId);if(!j)return;invJobId=jobId;editInvId=existing?existing.id:null;
+  $("#invTitle").textContent=existing?"Edit "+existing.number:"New invoice";
+  const bt=existing?existing.billTo:(j.jobType==="Auto Capital"?biz.ac:{name:j.customerName,company:"",address:[j.customerAddress,j.postcode].filter(Boolean).join("\n"),phone:j.customerPhone,phone2:"",email:j.customerEmail});
+  $("#iName").value=bt.name||"";$("#iCompany").value=bt.company||"";$("#iAddress").value=bt.address||"";$("#iPhone").value=bt.phone||"";$("#iPhone2").value=bt.phone2||"";$("#iEmail").value=bt.email||"";
+  invLines=existing?existing.lines.map(l=>({...l})):[{description:[fmtReg(j.reg),j.description].filter(Boolean).join(" – ")||vehLabel(j),rate:j.cost||j.quote||"",qty:1}];
+  $("#iDate").value=existing?existing.date:todayStr();$("#iDue").value=existing?existing.due:"On Receipt";
+  invPaid=existing?!!existing.paid:!!j.paid;$("#iPaid").classList.toggle("on",invPaid);$("#iPaidRow").style.display=invPaid?"":"none";
+  $("#iPaidDate").value=existing?.paidDate||(j.paidAt?ymd(new Date(j.paidAt)):todayStr());$("#iPayMethod").value=existing?.payMethod||(j.payMethod==="Bank transfer"?"Bank Transfer":j.payMethod||"Bank Transfer");
+  invPhotos=existing?existing.includePhotos!==false:true;$("#iPhotos").classList.toggle("on",invPhotos);$("#iNote").value=existing?.note||"";
+  $("#invSave").textContent=existing?"Save & regenerate PDFs":"Create invoice & job report";
+  renderInvLines();openSheet("#invSheet");
+}
+$("#invSave").onclick=async()=>{
+  const j=jobs.find(x=>x.id===invJobId);if(!j)return;
+  const lines=invLines.map(l=>({description:(l.description||"").trim(),rate:Number(l.rate)||0,qty:Number(l.qty)||1})).filter(l=>l.description||l.rate);
+  if(!lines.length)return toast("Add at least one line");
+  if(!$("#iName").value.trim()&&!$("#iCompany").value.trim())return toast("Enter who to bill");
+  $("#invSave").disabled=true;
+  try{
+    let number,id=editInvId;
+    if(!id){const n=Number(biz.next)||1;number=`${biz.prefix||"CK-"}${String(n).padStart(4,"0")}`;await setDoc(doc(db,"settings","business"),{...biz,next:n+1},{merge:true})}
+    else number=invoices.find(i=>i.id===id).number;
+    const data={number,jobId:invJobId,jobType:j.jobType||"Private",vehicle:vehLabel(j),reg:j.reg||"",customerName:j.customerName||"",
+      billTo:{name:$("#iName").value.trim(),company:$("#iCompany").value.trim(),address:$("#iAddress").value.trim(),phone:$("#iPhone").value.trim(),phone2:$("#iPhone2").value.trim(),email:$("#iEmail").value.trim()},
+      lines,total:lines.reduce((s,l)=>s+l.rate*l.qty,0),date:$("#iDate").value||todayStr(),due:$("#iDue").value,paid:invPaid,paidDate:invPaid?($("#iPaidDate").value||todayStr()):"",payMethod:invPaid?$("#iPayMethod").value:"",
+      includePhotos:invPhotos,note:$("#iNote").value.trim(),updatedAt:serverTimestamp()};
+    if(id)await updateDoc(doc(db,"invoices",id),data);else{const r=await addDoc(collection(db,"invoices"),{...data,createdAt:serverTimestamp()});id=r.id}
+    const jobUpd={invoiceId:id,invoiceNumber:number,cost:data.total,status:invPaid?"Paid":"Invoiced"};
+    if(invPaid){jobUpd.paid=true;jobUpd.paidAt=new Date(data.paidDate+"T12:00:00").getTime();jobUpd.payMethod=data.payMethod}
+    await updateDoc(doc(db,"jobs",invJobId),jobUpd);
+    closeSheet("#invSheet");toast(number+" created – building PDFs…");
+    const inv={id,...data};const jj={...j,...jobUpd};
+    await shareInvoiceAndReport(inv,jj);
+  }catch(e){console.error(e);toast("Invoice failed: "+e.message)}
+  $("#invSave").disabled=false;
+};
+async function jobPhotos(jobId){if(openJobId===jobId&&photos.length)return photos;const s=await getDocs(query(collection(db,"jobs",jobId,"photos"),orderBy("createdAt","asc")));return s.docs.map(d=>({id:d.id,...d.data()}))}
+async function shareInvoiceAndReport(inv,j){
+  const ph=await jobPhotos(j.id);const saved=photos;photos=ph;
+  try{
+    const a=await makeInvoicePdf(inv,false,ph);const b=await makePdf(j,true);
+    const files=[new File([a.blob],a.name,{type:"application/pdf"}),new File([b.blob],b.name,{type:"application/pdf"})];
+    if(navigator.canShare&&navigator.canShare({files})){try{await navigator.share({files,title:inv.number+" – CK Dentmaster"});return}catch(e){if(e.name==="AbortError")return}}
+    for(const f of files)await shareOrDownload(f,f.name,"application/pdf");
+  }finally{photos=saved}
+}
+/* Invoice PDF – laid out like the existing CK Dentmaster invoice template */
+async function makeInvoicePdf(inv,share,ph){
+  if(!window.jspdf)return toast("PDF library still loading – try again");
+  if(share)toast("Building invoice…");
+  const {jsPDF}=window.jspdf;const pdf=new jsPDF({unit:"mm",format:"a4"});const W=210,M=16;const dark=[25,25,25],grey=[120,120,120],line=[200,200,200];
+  const logo=await getLogo();let y=14;
+  pdf.setFillColor(0,0,0);pdf.roundedRect(M,y,46,18,1,1,"F");pdf.addImage(logo,"PNG",M+1,y+1,44,16);
+  pdf.setFont("helvetica","normal");pdf.setFontSize(9.5);pdf.setTextColor(60,60,60);
+  const bizLines=[biz.name,...(biz.address||"").split("\n"),biz.phone,biz.email].filter(Boolean);pdf.text(bizLines,M+54,y+4);
+  const lab=(k,v,yy,bold)=>{pdf.setFontSize(7.5);pdf.setTextColor(...grey);pdf.setFont("helvetica","bold");pdf.text(k,W-M,yy,{align:"right"});pdf.setFontSize(bold?11:9.5);pdf.setTextColor(...dark);pdf.setFont("helvetica",bold?"bold":"normal");pdf.text(v,W-M,yy+5,{align:"right"})};
+  const balance=inv.paid?0:inv.total;
+  lab("INVOICE",inv.number,y+3,true);lab("DATE",new Date(inv.date+"T00:00:00").toLocaleDateString("en-GB"),y+14);lab("DUE",inv.due||"On Receipt",y+25);lab("BALANCE DUE","GBP "+money(balance),y+36,true);
+  y=Math.max(y+4+bizLines.length*4.5,y+48)+6;pdf.setDrawColor(...line);pdf.line(M,y,W-M,y);y+=8;
+  pdf.setFontSize(7.5);pdf.setTextColor(...grey);pdf.setFont("helvetica","bold");pdf.text("BILL TO",M,y);y+=6;
+  const bt=inv.billTo||{};pdf.setFontSize(12);pdf.setTextColor(...dark);if(bt.name){pdf.text(bt.name,M,y);y+=6}
+  pdf.setFont("helvetica","normal");pdf.setFontSize(9.5);const btLines=[bt.company,...(bt.address||"").split("\n"),bt.phone?"Tel "+bt.phone:"",bt.phone2?"Mob "+bt.phone2:"",bt.email].filter(Boolean);pdf.text(btLines,M,y);y+=btLines.length*4.8+8;
+  // table
+  pdf.setDrawColor(...dark);pdf.setLineWidth(.4);pdf.line(M,y,W-M,y);y+=5;pdf.setFontSize(7.5);pdf.setTextColor(...grey);pdf.setFont("helvetica","bold");
+  pdf.text("DESCRIPTION",M,y);pdf.text("RATE",W-M-52,y,{align:"right"});pdf.text("QTY",W-M-30,y,{align:"right"});pdf.text("AMOUNT",W-M,y,{align:"right"});y+=3;pdf.setDrawColor(...line);pdf.setLineWidth(.2);pdf.line(M,y,W-M,y);y+=6;
+  pdf.setFont("helvetica","normal");pdf.setFontSize(10);pdf.setTextColor(...dark);
+  inv.lines.forEach(l=>{const d=pdf.splitTextToSize(l.description||"",W-M*2-70);pdf.text(d,M,y);pdf.text(money(l.rate),W-M-52,y,{align:"right"});pdf.text(String(l.qty),W-M-30,y,{align:"right"});pdf.text(money(l.rate*l.qty),W-M,y,{align:"right"});y+=d.length*5+3;pdf.line(M,y-1,W-M,y-1);y+=4});
+  // payment info + totals
+  const top=y+4;pdf.setFont("helvetica","bold");pdf.setFontSize(12);pdf.setTextColor(...dark);pdf.text("Payment Info",M,top+4);
+  pdf.setFontSize(7.5);pdf.setTextColor(...grey);pdf.text("PAYMENT INSTRUCTIONS",M,top+13);pdf.setFont("helvetica","normal");pdf.setFontSize(9.5);pdf.setTextColor(60,60,60);
+  const pay=[biz.bank,biz.acc?"Acc no: "+biz.acc:"",biz.sort?"Sort code: "+biz.sort:"",biz.accName].filter(Boolean);pdf.text(pay,M,top+19);
+  let ty=top+2;const tx=W/2+6;const trow=(k,v,bold,sub)=>{pdf.setFont("helvetica",bold?"bold":"normal");pdf.setFontSize(bold?11:9);pdf.setTextColor(...(sub?grey:dark));pdf.text(k,tx,ty);pdf.setTextColor(...dark);pdf.text(v,W-M,ty,{align:"right"});ty+=sub?4.5:7};
+  pdf.setFontSize(7.5);pdf.setTextColor(...grey);pdf.setFont("helvetica","bold");pdf.text("TOTAL",tx,ty);pdf.setFontSize(10);pdf.setTextColor(...dark);pdf.text(money(inv.total),W-M,ty,{align:"right"});ty+=8;
+  if(inv.paid){pdf.setFontSize(8);pdf.setTextColor(...grey);pdf.setFont("helvetica","normal");pdf.text("Payment",tx+3,ty);pdf.setTextColor(...dark);pdf.text("-"+money(inv.total),W-M,ty,{align:"right"});ty+=4.5;pdf.setTextColor(...grey);pdf.text(inv.payMethod||"",tx+3,ty);pdf.text(new Date(inv.paidDate+"T00:00:00").toLocaleDateString("en-GB"),W-M,ty,{align:"right"});ty+=5}
+  pdf.setDrawColor(...line);pdf.line(tx,ty,W-M,ty);ty+=6;pdf.setFontSize(7.5);pdf.setTextColor(...grey);pdf.setFont("helvetica","bold");pdf.text("BALANCE DUE",tx,ty);pdf.setFontSize(12);pdf.setTextColor(...dark);pdf.text("GBP "+money(balance),W-M,ty,{align:"right"});ty+=8;
+  y=Math.max(ty,top+19+pay.length*4.5)+6;
+  if(inv.note){pdf.setFont("helvetica","italic");pdf.setFontSize(9);pdf.setTextColor(...grey);pdf.text(pdf.splitTextToSize(inv.note,W-M*2),M,y);y+=10}
+  // photos (2 columns with captions)
+  const pics=inv.includePhotos===false?[]:(ph||photos);
+  if(pics.length){y+=4;const cw=(W-M*2-8)/2;let col=0,rowH=0;
+    for(const p of pics){const[iw,ih]=await imgDims(p.data);const h=Math.min(cw*ih/iw,cw*0.8);if(col===0&&y+h+10>282){pdf.addPage();y=16}
+      const x=M+col*(cw+8);let w2=cw,h2=cw*ih/iw;if(h2>h){h2=h;w2=h*iw/ih}pdf.addImage(p.data,"JPEG",x+(cw-w2)/2,y,w2,h2);pdf.setFont("helvetica","normal");pdf.setFontSize(8.5);pdf.setTextColor(60,60,60);
+      const cap=(p.type==="before"?"Before":"After")+(inv.lines[0]?.description?" – "+(p.type==="before"?inv.reg||inv.vehicle:(inv.lines[0].description.split(" – ").pop())):"");pdf.text(pdf.splitTextToSize(cap,cw),x,y+h+4);
+      col++;if(col===2){col=0;y+=rowH+12;rowH=0}else rowH=Math.max(rowH,h)}
+    if(col)y+=rowH+12}
+  const n=pdf.internal.getNumberOfPages();for(let i=1;i<=n;i++){pdf.setPage(i);pdf.setFontSize(7.5);pdf.setTextColor(...grey);pdf.setFont("helvetica","normal");pdf.text(`${inv.number} · ${biz.name}`,M,291);pdf.text(`Page ${i} of ${n}`,W-M,291,{align:"right"})}
+  const name=`${inv.number}-${(inv.reg||inv.customerName||"invoice").replace(/\s+/g,"")}.pdf`;const blob=pdf.output("blob");
+  if(!share)return{blob,name};await shareOrDownload(blob,name,"application/pdf");
+}
+/* Invoices list */
+$("#invFilters").onclick=e=>{const c=e.target.closest(".chip");if(!c)return;invFilter=c.dataset.f;$$("#invFilters .chip").forEach(x=>x.classList.toggle("active",x===c));renderInvoices()};
+function invCard(i){return`<div class="card tap invcard" data-id="${i.id}"><div class="spread"><div><div style="font-weight:700;font-size:16px">${esc(i.number)} <span class="badge ${i.jobType==="Auto Capital"?"t-ac":"t-pr"}">${i.jobType==="Auto Capital"?"AC":"Private"}</span></div><div class="small muted">${esc(i.billTo?.company||i.billTo?.name||"")} · ${esc(i.vehicle)}${i.reg?" "+esc(fmtReg(i.reg)):""}</div><div class="small muted">${fmtDate(i.date)}${i.paid?" · paid "+new Date(i.paidDate+"T00:00:00").toLocaleDateString("en-GB"):""}</div></div><div style="text-align:right"><div class="cost">${money(i.total)}</div><span class="badge ${i.paid?"s-paid":"s-inprogress"}">${i.paid?"Paid":"Due"}</span></div></div></div>`}
+function renderInvoices(){const issued=invoices.reduce((s,i)=>s+(Number(i.total)||0),0),paid=invoices.filter(i=>i.paid).reduce((s,i)=>s+(Number(i.total)||0),0);
+  $("#invStats").innerHTML=[["Issued",money(issued),invoices.length+" inv"],["Paid",money(paid),invoices.filter(i=>i.paid).length+" inv"],["Outstanding",money(issued-paid),invoices.filter(i=>!i.paid).length+" inv"]].map(([k,v,n])=>`<div class="stat" style="padding:10px"><div class="v" style="font-size:17px">${v}</div><div class="k">${k}</div><div class="small muted">${n}</div></div>`).join("");
+  const list=invoices.filter(i=>invFilter==="all"||(invFilter==="paid"?i.paid:!i.paid));
+  $("#invList").innerHTML=list.length?list.map(invCard).join(""):'<div class="empty">No invoices here.<br>Finish a job and tap "Finish & invoice".</div>';
+  $$(".invcard").forEach(el=>el.onclick=()=>openInvDetail(el.dataset.id))}
+function openInvDetail(id){openInvId=id;renderInvDetail(id);openSheet("#invDetailSheet")}
+$("#invDetailClose").onclick=()=>{closeSheet("#invDetailSheet");openInvId=null};
+function renderInvDetail(id){const i=invoices.find(x=>x.id===id);if(!i){$("#invDetailBody").innerHTML='<div class="empty">Invoice not found.</div>';return}const bt=i.billTo||{};
+  $("#invDetailBody").innerHTML=`<div class="card"><div class="spread"><div><div style="font-size:22px;font-weight:700">${esc(i.number)}</div><div class="muted">${fmtDate(i.date)} · ${esc(i.due)}</div></div><div style="text-align:right"><div class="cost" style="font-size:22px">${money(i.total)}</div><span class="badge ${i.paid?"s-paid":"s-inprogress"}">${i.paid?"Paid "+new Date(i.paidDate+"T00:00:00").toLocaleDateString("en-GB"):"Outstanding"}</span></div></div></div>
+    <div class="section">Bill to</div><div class="card"><div style="font-weight:700">${esc(bt.name||"")}</div><div class="small" style="white-space:pre-wrap">${esc([bt.company,bt.address].filter(Boolean).join("\n"))}</div><div class="links">${bt.phone?`<a href="tel:${esc(bt.phone)}">Call</a>`:""}${bt.email?`<a href="mailto:${esc(bt.email)}">Email</a>`:""}</div></div>
+    <div class="section">Lines</div><div class="card">${i.lines.map(l=>`<div class="spread" style="padding:4px 0;border-bottom:1px solid var(--line)"><span>${esc(l.description)}</span><span class="small muted">${money(l.rate)} × ${l.qty} = <b style="color:var(--text)">${money(l.rate*l.qty)}</b></span></div>`).join("")}</div>
+    <div class="section">Job</div><div class="card tap" id="invJob"><div style="font-weight:700">${esc(i.vehicle)}${i.reg?' <span class="plate">'+esc(fmtReg(i.reg))+'</span>':""}</div><div class="small muted">${esc(i.customerName)} · ${esc(i.jobType)}</div></div>
+    <div class="card" style="display:flex;flex-direction:column;gap:10px;margin-top:14px">
+      <button class="btn primary" id="invPdfBtn">Share invoice PDF</button>
+      <button class="btn" id="invBothBtn">Share invoice + job report</button>
+      ${i.paid?`<button class="btn ghost" id="invUnpaid">Mark as unpaid</button>`:`<button class="btn" id="invMarkPaid" style="border-color:var(--lime);color:var(--lime)">Mark as paid</button>`}
+      <button class="btn ghost" id="invEdit">Edit invoice</button>
+      <button class="btn danger" id="invDelete">Delete invoice</button></div>`;
+  const on=(s,f)=>{const el=$(s);if(el)el.onclick=f};
+  on("#invJob",()=>{closeSheet("#invDetailSheet");openInvId=null;openDetail(i.jobId)});
+  on("#invPdfBtn",async()=>{const ph=await jobPhotos(i.jobId);await makeInvoicePdf(i,true,ph)});
+  on("#invBothBtn",()=>{const j=jobs.find(x=>x.id===i.jobId);if(!j)return toast("Job no longer exists");shareInvoiceAndReport(i,j)});
+  on("#invMarkPaid",async()=>{const d=todayStr();await updateDoc(doc(db,"invoices",id),{paid:true,paidDate:d,payMethod:"Bank Transfer"});if(jobs.find(x=>x.id===i.jobId))await updateDoc(doc(db,"jobs",i.jobId),{paid:true,paidAt:Date.now(),status:"Paid",payMethod:"Bank transfer"});toast("Marked as paid")});
+  on("#invUnpaid",async()=>{await updateDoc(doc(db,"invoices",id),{paid:false,paidDate:"",payMethod:""});if(jobs.find(x=>x.id===i.jobId))await updateDoc(doc(db,"jobs",i.jobId),{paid:false,paidAt:null,status:"Invoiced"});toast("Marked as unpaid")});
+  on("#invEdit",()=>{closeSheet("#invDetailSheet");openInvId=null;openInvoiceEditor(i.jobId,i)});
+  on("#invDelete",async()=>{if(!confirm("Delete "+i.number+"? The job stays."))return;await deleteDoc(doc(db,"invoices",id));if(jobs.find(x=>x.id===i.jobId))await updateDoc(doc(db,"jobs",i.jobId),{invoiceId:null,invoiceNumber:null});closeSheet("#invDetailSheet");openInvId=null;toast("Invoice deleted")});
+}
+
 /* ───────── Settings: price templates ───────── */
-$("#btnSettings").onclick=()=>{renderPriceRows();openSheet("#settingsSheet")};
+$("#btnSettings").onclick=()=>{renderPriceRows();fillBiz();openSheet("#settingsSheet")};
+function fillBiz(){const b=biz;$("#bName").value=b.name||"";$("#bAddress").value=b.address||"";$("#bPhone").value=b.phone||"";$("#bEmail").value=b.email||"";$("#bBank").value=b.bank||"";$("#bAcc").value=b.acc||"";$("#bSort").value=b.sort||"";$("#bAccName").value=b.accName||"";$("#bPrefix").value=b.prefix||"CK-";$("#bNext").value=b.next||1;
+  const a=b.ac||{};$("#acName").value=a.name||"";$("#acCompany").value=a.company||"";$("#acAddress").value=a.address||"";$("#acPhone").value=a.phone||"";$("#acPhone2").value=a.phone2||"";$("#acEmail").value=a.email||""}
 $("#settingsClose").onclick=()=>closeSheet("#settingsSheet");
 function renderPriceRows(list){const arr=list||prices||DEFAULT_PRICES;$("#priceRows").innerHTML=arr.map((p,i)=>`<div class="pricerow"><input class="input pName" value="${esc(p.name)}" placeholder="Name"><input class="input pAmt" inputmode="decimal" value="${p.amount}" placeholder="£"><button class="iconbtn pDel" data-i="${i}">×</button></div>`).join("");
   $$(".pDel").forEach(b=>b.onclick=()=>{const cur=readPriceRows();cur.splice(Number(b.dataset.i),1);renderPriceRows(cur)})}
 function readPriceRows(){return $$(".pricerow").map(r=>({name:r.querySelector(".pName").value.trim()||"Price",amount:Number(r.querySelector(".pAmt").value)||0}))}
 $("#priceAdd").onclick=()=>{const cur=readPriceRows();cur.push({name:"Price "+(cur.length+1),amount:0});renderPriceRows(cur)};
-$("#priceSave").onclick=async()=>{await setDoc(doc(db,"settings","pricing"),{items:readPriceRows(),updatedAt:serverTimestamp()});closeSheet("#settingsSheet");toast("Prices saved")};
+$("#priceSave").onclick=async()=>{await setDoc(doc(db,"settings","pricing"),{items:readPriceRows(),updatedAt:serverTimestamp()});
+  const b={name:$("#bName").value.trim(),address:$("#bAddress").value.trim(),phone:$("#bPhone").value.trim(),email:$("#bEmail").value.trim(),bank:$("#bBank").value.trim(),acc:$("#bAcc").value.trim(),sort:$("#bSort").value.trim(),accName:$("#bAccName").value.trim(),prefix:$("#bPrefix").value.trim()||"CK-",next:Number($("#bNext").value)||1,
+    ac:{name:$("#acName").value.trim(),company:$("#acCompany").value.trim(),address:$("#acAddress").value.trim(),phone:$("#acPhone").value.trim(),phone2:$("#acPhone2").value.trim(),email:$("#acEmail").value.trim()},updatedAt:serverTimestamp()};
+  await setDoc(doc(db,"settings","business"),b,{merge:true});closeSheet("#settingsSheet");toast("Settings saved")};
 
 /* ───────── Reports ───────── */
 $("#repType").onclick=e=>{const c=e.target.closest(".chip");if(!c)return;repType=c.dataset.t;$$("#repType .chip").forEach(x=>x.classList.toggle("active",x===c));renderReports()};
@@ -940,6 +1160,9 @@ $("#btnSeed").onclick=async()=>{if(!confirm("Add the sample job (Ajay Kawa, Rang
     const r=await addDoc(collection(db,"jobs"),job);
     for(const ph of seed.SAMPLE_PHOTOS)await addDoc(collection(db,"jobs",r.id,"photos"),{type:ph.type,data:ph.data,createdAt:serverTimestamp()});
     closeSheet("#settingsSheet");toast("Sample job added");openDetail(r.id)}catch(e){console.error(e);toast("Could not add sample: "+e.message)}};
+
+/* Date/time inputs: open the native picker on tap (helps Android Chrome/Samsung) */
+document.addEventListener("click",e=>{const el=e.target.closest('input[type="date"],input[type="time"]');if(el&&"showPicker"in el){try{el.showPicker()}catch(_){}}},true);
 
 /* ───────── PWA ───────── */
 if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});

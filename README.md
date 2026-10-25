@@ -13,6 +13,8 @@ A mobile job-management app for CK Dentmaster (paintless dent repair). It is an 
 - **Job types** – Auto Capital or Private, with filters on the jobs list and reports
 - **Price templates** – tap Price 1–4 (£100/£150/£200/£250 by default) to fill the price, still editable per job; edit the templates under Settings (gear icon)
 - **Reports tab** – this week / month / last month / year / custom range, by job type; totals plus a landscape PDF report and CSV export, both shareable
+- **Invoicing** – "Finish & invoice" on the job stops the timer, pre-fills an invoice (Auto Capital details or the private customer), and on save creates a numbered invoice PDF in the CK Dentmaster layout plus the job report, shared together. Invoices tab shows issued / paid / outstanding with mark-paid, edit and re-share.
+- Business details, bank details, invoice numbering and the Auto Capital bill-to defaults are under Settings
 - Customers list with job history and paid total
 - "Use my current location" on the job form pins GPS to the job (asks for location permission); photos ask for camera permission the first time
 - Stats: jobs, charged, paid, outstanding, average time and £ per job, breakdown by manufacturer
@@ -75,7 +77,7 @@ The CK icon appears on the home screen and the app opens full-screen.
 
 ## Updating the app
 
-Edit `index.html`, bump `CACHE = "ckdm-v5"` in `sw.js`, push to `main`. Phones pick up the new version next time the app opens online.
+Edit `index.html`, bump `CACHE = "ckdm-v7"` in `sw.js`, push to `main`. Phones pick up the new version next time the app opens online.
 
 ## Data model (Firestore)
 
@@ -87,5 +89,7 @@ Edit `index.html`, bump `CACHE = "ckdm-v5"` in `sw.js`, push to `main`. Phones p
 | `public_reports/{token}` | read-only copy of a job for the customer link |
 | `settings/vehicles` | makes/models you have added |
 | `settings/pricing` | price templates (items: name, amount) |
+| `settings/business` | trading name, address, phone, email, bank details, invoice prefix + next number, Auto Capital bill-to |
+| `invoices/{id}` | number, jobId, billTo{}, lines[], total, date, due, paid, paidDate, payMethod |
 
 Photos are kept in Firestore so the project stays on the free Spark plan (no Storage bucket or card needed).
